@@ -25,10 +25,10 @@ export default function Login() {
 
                 <Row className='mt-4'>
                   <Col>
-                <button className="btn btn-secondary" formAction={signup} style={{width:"165px"}}>Sign up</button>
+                <button className="btn btn-secondary" formAction={signup} style={{width:"150px"}}>Sign up</button>
                 </Col>
                 <Col>
-                <button className="btn btn-primary" formAction={login} style={{width:"165px"}}>Log in</button>
+                <button className="btn btn-primary" formAction={login} style={{width:"150px"}}>Log in</button>
                 </Col>
                 </Row>
           </form>
