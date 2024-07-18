@@ -76,7 +76,6 @@ export default function ProjectManager() {
 				throw error;
 			}
 
-			console.log('got work session data', data);
 			if (data && data.length > 0) {
 				setCurrentWorkSession(data[0]); // Set currentWorkSession to the inserted work session with id
 			}
