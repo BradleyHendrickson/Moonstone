@@ -1,0 +1,11 @@
+.footer-text {
+    position: fixed;
+    bottom: 10px;
+    right: 10px;
+    font-size: 12px;
+    font-family: 'Arial', sans-serif; /* Use a shorter font */
+    font-weight: bold; /* Make the text bold */
+    color: rgba(0, 0, 0, 0.4); /* Subtle color */
+    z-index: 1000; /* Ensure it stays on top */
+  }
+  

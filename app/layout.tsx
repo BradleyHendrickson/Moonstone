@@ -23,6 +23,7 @@ export default function RootLayout({
       <body>
           <TopNav />
           {children}
+
       </body>
     </html>
   );

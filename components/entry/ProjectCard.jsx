@@ -1,93 +1,100 @@
 import React, { useState } from 'react';
-import { Card, CardBody, CardTitle, CardText,CardSubtitle, Button, Row, Col } from 'reactstrap';
+import { Card, CardBody, CardTitle, Button, Row, Col } from 'reactstrap';
+import { IconGripVertical, IconReceipt2, IconCurrencyDollar, IconClock } from '@tabler/icons-react';
 
 import '/components/styles/styles.css';
-function ProjectCard({ project, canEdit, setEditingProject, setEditModal, refreshData, startWork }) {
-    const [isHovered, setIsHovered] = useState(false);
 
-    async function deleteProject(id, user_id) {
-        const supabase = createClient();
-    
-        try {
-            let { data, error } = await supabase
-                .from("projects")
-                .delete()
-                .eq("id", id)
-                .eq("user_id", user_id);
-    
-            if (error) {
-                throw error;
-            }
-    
-            return data;
-        } catch (error) {
-            console.error("Error deleting project:", error);
-            return null;
-        }
-    }
+function ProjectCard({ project, canEdit, setEditingProject, setEditModal, refreshData, startWork, currentWorkSession }) {
+	const [isHovered, setIsHovered] = useState(false);
 
-    return (
-        <Card
-            key={project.id}
-            className="mt-2"
-            onMouseEnter={() => setIsHovered(true)}
-            onMouseLeave={() => setIsHovered(false)}
-            
-        >
-            <CardBody className='p-2' style={{backgroundColor: "#F0F0F0"}}>
-                <Row>
-                    <Col>
-                        <CardTitle tag="h6">{project.name}</CardTitle>
-                        {/*<CardText style={{fontSize:"14px", fontStyle:"italic"}} className="mb-2 text-muted">{project.status}</CardText>*/}
-                    </Col>
-                    {
-                        canEdit ? (
-                            <Col xs="auto">
-                                <Button
-                                    size='sm'
-                                    color="danger"
-                                    style={{ float: "right" }}
-                                    onClick={async () => {
-                                        await deleteProject(project.id, project.user_id);
-                                        refreshData('project card');
-                                    }}
-                                >
-                                    Delete
-                                </Button>
-                                <Row>
-                                    <Col>
-                                        <Button
-                                        size='sm'
-                                            color="secondary"
-                                            style={{ float: "right" }}
-                                            onClick={() => {
-                                                setEditingProject(project);
-                                                setEditModal(true);
-                                            }}
-                                        >
-                                            Edit
-                                        </Button>
-                                    </Col>
-                                </Row>
-                            </Col>
-                        ) : (
-                            <Col xs="auto">
-                                <Button
-                                size='sm'
-                                    color="secondary"
-                                    className={`start-work-button ${isHovered ? 'show' : ''}`}
-                                    style={{ float: "right" }}
-                                    onClick={() => startWork(project)}
-                                >
-                                    Start Work
-                                </Button>
-                            </Col>
-                        )
-                    }
-                </Row>
-            </CardBody>
-        </Card>
-    );
+	async function deleteProject(id, user_id) {
+		const supabase = createClient();
+
+		try {
+			let { data, error } = await supabase.from('projects').delete().eq('id', id).eq('user_id', user_id);
+
+			if (error) {
+				throw error;
+			}
+
+			return data;
+		} catch (error) {
+			console.error('Error deleting project:', error);
+			return null;
+		}
+	}
+
+	const handleCardClick = () => {
+		if (!canEdit) {
+			startWork(project);
+		}
+	};
+
+	return (
+		<Card
+			key={project.id}
+			className={`mt-2 ${isHovered ? 'highlight' : ''} ${currentWorkSession?.project_id === project.id ? 'pulsing-card' : ''}`}
+			onMouseEnter={() => setIsHovered(true)}
+			onMouseLeave={() => setIsHovered(false)}
+			onClick={handleCardClick}
+			style={{
+				cursor: canEdit ? 'default' : 'pointer',
+				backgroundColor: isHovered && !canEdit ? '#e0e0e0' : '#F0F0F0'
+			}}
+		>
+			<CardBody className="p-2">
+				<Row>
+					{canEdit && (
+						<Col xs="auto" className="d-flex align-items-center">
+							<IconGripVertical />
+						</Col>
+					)}
+					<Col>
+						<CardTitle tag="h6">{project.name}</CardTitle>
+					</Col>
+					{project.billable && (
+						<Col xs="auto">
+							<IconCurrencyDollar title="Billable Project" />
+						</Col>
+					)}
+					{isHovered && (
+						<Col xs="auto">
+							<IconClock size={20} style={{ marginLeft: 5, cursor: 'pointer' }} />
+							<strong style={{ textDecoration: 'underline', marginLeft: 5 }}>
+								{currentWorkSession?.project_id == project.id ? `` : currentWorkSession ? `Switch to This` : `Work on This`}
+							</strong>
+						</Col>
+					)}
+					{canEdit && (
+						<Col xs="auto">
+							<Button
+								size="sm"
+								color="danger"
+								style={{ float: 'right', marginLeft: '5px' }}
+								onClick={async () => {
+									await deleteProject(project.id, project.user_id);
+									refreshData('project card');
+								}}
+							>
+								Delete
+							</Button>
+							<Button
+								size="sm"
+								color="secondary"
+								style={{ float: 'right', marginRight: '5px' }}
+								onClick={() => {
+									setEditingProject(project);
+									setEditModal(true);
+								}}
+							>
+								Edit
+							</Button>
+						</Col>
+					)}
+				</Row>
+			</CardBody>
+		</Card>
+	);
 }
 
 export default ProjectCard;

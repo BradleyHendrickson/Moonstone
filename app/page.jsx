@@ -1,27 +1,14 @@
-'use client'
+'use server'
 import Image from "next/image";
-import { useEffect, useState } from 'react';
+import "./globals.css";
 import { Container, Row, Col, Card, CardText, CardBody, CardTitle, CardSubtitle, Button } from 'reactstrap';
 import logoBlackSvg from '/public/logo_black.svg';
-import { createClient } from '@/utils/supabase/client';
+import { createClient } from '@/utils/supabase/server';
 import  Link  from  'next/link';
-export default function Index() {
+export default async function Index() {
+  const supabase = createClient();
 
-  const [user, setUser] = useState(null)
-
-    const supabase = createClient()
-    useEffect(() => {
-      getUser()
-  }, []);
-
-  async function getUser() {
-    try {
-      const {data: {user}} = await supabase.auth.getUser()
-      setUser(user)
-    } catch (error) {
-      console.log(error)
-    }
-  }
+  const {data: {user}} = await supabase.auth.getUser()
 
   return (
   <Container>
@@ -35,7 +22,7 @@ export default function Index() {
     </Col>
     <Col xs="auto" 
       //make the contents align to the bottom
-      className="d-flex align-items-end"
+      className="d-flex align-items-end mt-5 md-mt-0"
     >
       <Image
       priority
@@ -45,7 +32,7 @@ export default function Index() {
     />
       </Col>
     </Row>
-    
+    <div className="footer-text">Chatoyant Solutions</div>
   </Container>
   )
 

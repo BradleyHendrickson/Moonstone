@@ -7,4 +7,19 @@
   .start-work-button.show {
     opacity: 1;
   }
+
+  @keyframes gradient-sweep {
+    0% {
+      background-position: 100% 0;
+    }
+    100% {
+      background-position: -100% 0;
+    }
+  }
+  
+  .pulsing-card {
+    background: linear-gradient(90deg, #e0ffe0 25%, #85ff7781 50%, #e0ffe0 75%);
+    background-size: 200% 100%;
+    animation: gradient-sweep 6s linear infinite;
+  }
   

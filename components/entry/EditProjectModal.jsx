@@ -11,6 +11,7 @@ export default function EditProjectModal({ isOpen, toggle, user_id, projectData,
         name: projectData?.name,
         description: projectData?.description,
         status: projectData?.status,
+        billable: projectData?.billable,
     });
 
     useEffect(() => {
@@ -20,14 +21,23 @@ export default function EditProjectModal({ isOpen, toggle, user_id, projectData,
             name: projectData.name,
             description: projectData.description,
             status: projectData.status,
+            billable: projectData?.billable,
         });
     }, [projectData]);
 
     const handleChange = (e) => {
-        setEditedProject({
-            ...editedProject,
-            [e.target.name]: e.target.value
-        });
+        if (e.target.type === "checkbox") {
+            setEditedProject({
+                ...editedProject,
+                [e.target.name]: e.target.checked
+            });
+            return;
+        } else {
+            setEditedProject({
+                ...editedProject,
+                [e.target.name]: e.target.value
+            });
+        }
     }
 
     
@@ -39,9 +49,14 @@ export default function EditProjectModal({ isOpen, toggle, user_id, projectData,
                     name: editedProject.name,
                     description: editedProject.description,
                     status: editedProject.status,
+                    billable: editedProject.billable
                 })
                 .eq("id", editedProject.id)
-                .eq("user_id", user_id);
+                .eq("user_id", user_id)
+                .select()
+                ;
+
+            console.log('got back from update', data, error);
 
             if (error) {
                 throw error;
@@ -71,6 +86,12 @@ export default function EditProjectModal({ isOpen, toggle, user_id, projectData,
                     <FormGroup>
                         <Label for="editProjectStatus">Status</Label>
                         <Input onChange={handleChange} type="text" name="status" id="editProjectStatus" value={editedProject.status} placeholder="Project Status" />
+                    </FormGroup>
+                    <FormGroup check>
+                        <Label check>
+                            <Input onChange={handleChange} type="checkbox" name="billable" id="editProjectBillable" checked={editedProject.billable} />{' '}
+                            Billable
+                        </Label>
                     </FormGroup>
                 </Form>
             </ModalBody>

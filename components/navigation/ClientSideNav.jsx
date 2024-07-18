@@ -43,7 +43,8 @@ export default function ClientSideNav({signedIn}) {
       };
 
     return (
-        <Navbar color="dark" dark expand="md">
+        
+        <Navbar color="dark" dark expand="xs">
         <NavbarBrand href="/">    
         <Image
             priority
