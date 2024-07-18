@@ -11,7 +11,7 @@ export default function Login() {
           justifyContent: 'center',
       }}>
         <Card className='mt-5' style={{width:"400px"}}>
-        <CardTitle tag="h5" className="text-center mt-3">Authenticate Yourself!</CardTitle>
+        <CardTitle tag="h5" className="text-center mt-3">Login to Moonstone</CardTitle>
             <CardBody>
               <form>
                   <div className="form-group">
