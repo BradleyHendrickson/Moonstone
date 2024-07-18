@@ -1,0 +1,10 @@
+/* styles.css */
+.start-work-button {
+    opacity: 0;
+    transition: opacity 0.1s ease-in-out;
+  }
+  
+  .start-work-button.show {
+    opacity: 1;
+  }
+  

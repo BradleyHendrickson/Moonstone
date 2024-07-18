@@ -1,27 +1,28 @@
-import { GeistSans } from "geist/font/sans";
+
+import type { Metadata } from "next";
+import { Inter } from "next/font/google";
 import "./globals.css";
+import 'bootstrap/dist/css/bootstrap.min.css';
+import TopNav from '../components/navigation/topnav'
 
-const defaultUrl = process.env.VERCEL_URL
-  ? `https://${process.env.VERCEL_URL}`
-  : "http://localhost:3000";
 
-export const metadata = {
-  metadataBase: new URL(defaultUrl),
-  title: "Next.js and Supabase Starter Kit",
-  description: "The fastest way to build apps with Next.js and Supabase",
+const inter = Inter({ subsets: ["latin"] });
+
+export const metadata: Metadata = {
+  title: "Moonstone",
+  description: "helpful project tracker",
 };
 
 export default function RootLayout({
   children,
-}: {
+}: Readonly<{
   children: React.ReactNode;
-}) {
+}>) {
   return (
-    <html lang="en" className={GeistSans.className}>
-      <body className="bg-background text-foreground">
-        <main className="min-h-screen flex flex-col items-center">
+    <html lang='en'>
+      <body>
+          <TopNav />
           {children}
-        </main>
       </body>
     </html>
   );
