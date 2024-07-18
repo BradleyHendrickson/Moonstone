@@ -25,10 +25,10 @@ export default function Login() {
 
                 <Row className='mt-4'>
                   <Col>
-                <button className="btn btn-secondary" formAction={signup} style={{width:"170px"}}>Sign up</button>
+                <button className="btn btn-secondary" formAction={signup} style={{width:"165px"}}>Sign up</button>
                 </Col>
                 <Col>
-                <button className="btn btn-primary" formAction={login} style={{width:"170px"}}>Log in</button>
+                <button className="btn btn-primary" formAction={login} style={{width:"165px"}}>Log in</button>
                 </Col>
                 </Row>
           </form>
@@ -39,45 +39,3 @@ export default function Login() {
     </Container>
   );
 }
- /*
-
- import { login, signup } from './actions'
-import { Container, Card, CardTitle, Row, Col, Button, Form, FormGroup, Label, Input, CardBody } from 'reactstrap';
-export default function Login() {
-
-
-  return (
-    <Container>
-    <Row>
-      <Col style={{
-          display: 'flex',
-          justifyContent: 'center',
-      }}>
-        <Card className='mt-5' style={{width:"400px"}}>
-        <CardTitle tag="h5" className="text-center mt-3">Authenticate Yourself!</CardTitle>
-            <CardBody>
-              <form>
-
-                  <label htmlFor="email">Email:</label>
-                  <input className="form-control" id="email" name="email" type="email" required />
-
-
-                    <label htmlFor="password">Password:</label>
-                    <input className="form-control" id="password" name="password" type="password" required />
-
-
-
-                <button type="button" className="btn btn-secondary" formAction={signup} style={{width:"170px"}}>Sign up</button>
-
-                <button type="button" className="btn btn-primary" formAction={login} style={{width:"170px"}}>Log in</button>
-           
-          </form>
-          </CardBody>
-          </Card>
-        </Col>
-      </Row>
-    </Container>
-
-  );
-}
-*/
