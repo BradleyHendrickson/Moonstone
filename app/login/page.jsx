@@ -1,10 +1,73 @@
-import { login, signup } from './actions'
-import { Container, Card, CardTitle, Row, Col, Button, Form, FormGroup, Label, Input, CardBody } from 'reactstrap';
-export default function Login() {
+'use client'
 
+import { useState} from 'react'
+//import { login, signup, signUpUser, signInUser } from './actions'
+import { Container, Card, CardTitle, Row, Col, Button, Form, FormGroup, Label, Input, CardBody, Alert} from 'reactstrap';
+import { createClient } from '@/utils/supabase/client'
+
+
+export default function Login() {
+  const supabase = createClient()
+
+  const [email, setEmail] = useState('')
+  const [password, setPassword] = useState('')
+  const [message, setMessage] = useState('')
+  const [successMessage, setSuccessMessage] = useState('')
+
+
+  async function signUpNewUser() {
+    const { data, error } = await supabase.auth.signUp({
+      email: email,
+      password: password,
+      options: {
+        emailRedirectTo: 'https://moonstone-prod.vercel.app/',
+      },
+    })
+
+    if (error) {
+      setMessage(error.message)
+    }
+    else {
+      setSuccessMessage('Check your email to confirm your account')
+    }
+
+  }
+  
+  async function signInWithEmail() {
+    const { data, error } = await supabase.auth.signInWithPassword({
+      email: email,
+      password: password,
+    })
+    
+    if (error) {
+      setMessage(error.message)
+    }
+
+    if (!error && data) {
+      // redirect to /
+      window.location.href = '/'
+    }
+  }
+  
+  const onDismiss = () => setMessage('')
 
   return (
+    <>
+      <div
+        style={{
+          background: 'linear-gradient(to bottom right, #1a1f71, #9a3f1b)',
+          minHeight: '100vh',
+          overflow: 'hidden', // Prevents scrolling of the background gradient
+          position: 'fixed', // Fixes the element so it doesn't scroll
+          top: 0, left: 0, right: 0, bottom: 0, // Ensures the element covers the entire viewport
+          zIndex: -1, // Places the background behind other content
+          filter: 'grayscale(70%)' // Applies heavy greyscale
+          //lighten the greyscaled background
+        }}
+      ></div>
+      
     <Container>
+      <script src="https://accounts.google.com/gsi/client" async></script>
     <Row>
       <Col style={{
           display: 'flex',
@@ -13,29 +76,46 @@ export default function Login() {
         <Card className='mt-5' style={{width:"400px"}}>
         <CardTitle tag="h5" className="text-center mt-3">Login to Moonstone</CardTitle>
             <CardBody>
-              <form>
-                  <div className="form-group">
-                  <label htmlFor="email">Email</label>
-                  <input className="form-control" id="email" name="email" type="email" required />
-                  </div>
-                  <div className="form-group mt-4">
-                    <label htmlFor="password">Password</label>
-                    <input className="form-control" id="password" name="password" type="password" required />
-                  </div>
 
-                <Row className='mt-4'>
-                  <Col>
-                <button className="btn btn-secondary" formAction={signup} style={{width:"150px"}}>Sign up</button>
+              <Row>
+                <Col>
+                  <FormGroup>
+                    <Label for="email">Email</Label>
+                    <Input type="email" name="email" id="email" placeholder="Email" value={email} onChange={(e) => setEmail(e.target.value)} />
+                  </FormGroup>
+                </Col>
+              </Row>
+              <Row>
+                <Col>
+                  <FormGroup>
+                    <Label for="password">Password</Label>
+                    <Input type="password" name="password" id="password" placeholder="Password" value={password} onChange={(e) => setPassword(e.target.value)} />
+                  </FormGroup>
+                </Col>
+              </Row>
+              <Row>
+                <Col>
+                  {/* add an x button that clears the message */}
+                  { message && <Alert className="p-2" color="danger">{message}</Alert> }
+                  { successMessage && <Alert className="p-2" color="success">{successMessage}</Alert> }
+
+
+                </Col>
+              </Row>
+              <Row>
+                <Col>
+                  <Button className='mt-3' style={{width:"100%"}} color="secondary" onClick={signUpNewUser}>Sign Up</Button>
                 </Col>
                 <Col>
-                <button className="btn btn-primary" formAction={login} style={{width:"150px"}}>Log in</button>
+                  <Button className='mt-3' style={{width:"100%", float:"right"}} color="primary" onClick={signInWithEmail}>Login</Button>
                 </Col>
-                </Row>
-          </form>
-          </CardBody>
+              </Row>
+
+            </CardBody>
           </Card>
         </Col>
       </Row>
     </Container>
+    </>
   );
 }
