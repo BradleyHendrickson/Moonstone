@@ -13,7 +13,7 @@ import moment from 'moment';
 
 function createGreetingString(currentTime, userName) {
 	if (currentTime < 12) {
-		return `Good Morning}!`;
+		return `Good Morning!`;
 	} else if (currentTime < 18) {
 		return `Good Afternoon!`;
 	} else {

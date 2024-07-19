@@ -28,6 +28,7 @@ function ProjectCard({ project, canEdit, setEditingProject, setEditModal, refres
 		if (!canEdit) {
 			startWork(project);
 		}
+		setIsHovered(false);
 	};
 
 	return (

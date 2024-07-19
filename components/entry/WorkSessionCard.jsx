@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Card, CardBody, CardTitle, CardText, Row, Col } from 'reactstrap';
 import moment from 'moment'; // Ensure moment.js is installed
 import { IconPencil } from '@tabler/icons-react';
@@ -24,7 +24,10 @@ const WorkSessionCard = ({ workSession, projectName, updateWorkSession }) => {
     const [isOpen, setIsOpen] = useState(false);
     const [isHovered, setIsHovered] = useState(false);
 
-    const toggle = () => setIsOpen(!isOpen);
+    const toggle = () => {
+        setIsOpen(!isOpen)
+        setIsHovered(false);
+    };
 
     const handleMouseEnter = () => {
         setIsHovered(true);
