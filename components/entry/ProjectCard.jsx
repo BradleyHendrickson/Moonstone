@@ -25,6 +25,11 @@ function ProjectCard({ project, canEdit, setEditingProject, setEditModal, refres
 	}
 
 	const handleCardClick = () => {
+
+		if (currentWorkSession?.project_id === project.id) {
+			return
+		}
+
 		if (!canEdit) {
 			startWork(project);
 		}

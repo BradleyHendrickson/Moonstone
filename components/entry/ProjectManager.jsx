@@ -84,9 +84,9 @@ export default function ProjectManager() {
 		}
 	}
 
-	function finishSession() {
+	function finishSession(session) {
 		const updatedWorkSession = {
-			...currentWorkSession,
+			...session,
 			//use format "2024-07-17T02:44:16.411+00:00"
 			stop_time: new Date().toISOString()
 		};
@@ -95,7 +95,13 @@ export default function ProjectManager() {
 	}
 
 	function startWork(project) {
-		console.log('starting work');
+
+		//if there is a current work session, finish it
+		if (currentWorkSession) {
+			finishSession(currentWorkSession);
+		}
+
+		//start a new work session
 		saveWorkSession({
 			project_id: project.id,
 			start_time: new Date().toISOString(),
@@ -299,7 +305,7 @@ export default function ProjectManager() {
 												<LiveTimeCounter startTime={currentWorkSession?.start_time} />
 											</Col>
 											<Col>
-												<Button style={{ float: 'right' }} color="success" onClick={finishSession}>
+												<Button style={{ float: 'right' }} color="success" onClick={() => finishSession(currentWorkSession)}>
 													Stop Session
 												</Button>
 											</Col>
