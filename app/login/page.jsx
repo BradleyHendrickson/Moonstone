@@ -1,6 +1,7 @@
 'use client'
 
 import { useState} from 'react'
+import "../globals.css";
 //import { login, signup, signUpUser, signInUser } from './actions'
 import { Container, Card, CardTitle, Row, Col, Button, Form, FormGroup, Label, Input, CardBody, Alert} from 'reactstrap';
 import { createClient } from '@/utils/supabase/client'
@@ -110,11 +111,12 @@ export default function Login() {
                   <Button className='mt-3' style={{width:"100%", float:"right"}} color="primary" onClick={signInWithEmail}>Login</Button>
                 </Col>
               </Row>
-
+              
             </CardBody>
           </Card>
         </Col>
       </Row>
+      <div className="footer-text" style={{color:"#909090"}}>Chatoyant Solutions</div>
     </Container>
     </>
   );
