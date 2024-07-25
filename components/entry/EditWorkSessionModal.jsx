@@ -25,6 +25,8 @@ export default function EditWorkSessionModal({ workSession, projectName, isOpen,
     }, [isOpen]);
 
     const handleUpdate = () => {
+        console.log("start time: ", start_time);
+        console.log("stop time: ", stop_time);
         updateWorkSession({
             id: workSession.id,
             start_time: new Date(start_time).toISOString(),

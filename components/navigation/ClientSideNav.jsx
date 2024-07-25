@@ -54,14 +54,21 @@ export default function ClientSideNav({signedIn}) {
         />
         <span style={{marginLeft:"0.75rem"}}>Moonstone</span></NavbarBrand>
         <Nav className="ml-auto" navbar>
-            <NavItem
-                //hide this on xs devices
-                className="d-none d-sm-block"
-            >
-                <NavLink href="/dashboard/" 
-                    //show as active if the current path is /dashboard/
+            <NavItem className="d-none d-sm-block">
+                <NavLink 
+                    href="/weeklysummary/"
+                    active={activeRoute("/weeklysummary") ? true : false}
+                >
+                    Weekly Summary
+                </NavLink>
+            </NavItem>
+            <NavItem className="d-none d-sm-block">
+                <NavLink 
+                    href="/dashboard/"
                     active={activeRoute("/dashboard") ? true : false}
-                >Dashboard</NavLink>
+                >
+                    Dashboard
+                </NavLink>
             </NavItem>
 
             <NavItem>

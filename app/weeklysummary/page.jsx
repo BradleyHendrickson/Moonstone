@@ -1,9 +1,10 @@
-'use client'
+'use client';
 import React, { useState, useEffect } from 'react';
-import { Container, Row, Col, Spinner, Button } from 'reactstrap';
+import { Container, Row, Col, Spinner, Button, Card, CardBody, Collapse } from 'reactstrap';
 import moment from 'moment';
 import WorkSessionCard from '@/components/entry/WorkSessionCard';
 import { createClient } from '@/utils/supabase/client';
+import { IconCaretLeft, IconCaretRight } from '@tabler/icons-react';
 
 export default function WeeklyWorkSessions() {
   const supabase = createClient();
@@ -11,6 +12,7 @@ export default function WeeklyWorkSessions() {
   const [workSessions, setWorkSessions] = useState([]);
   const [projects, setProjects] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [expandedDays, setExpandedDays] = useState({}); // State to track which days are expanded
 
   useEffect(() => {
     fetchProjects();
@@ -21,6 +23,26 @@ export default function WeeklyWorkSessions() {
       fetchWorkSessions(selectedWeek);
     }
   }, [selectedWeek, projects]);
+
+	async function updateWorkSession(workSession) {
+		try {
+			const { data, error } = await supabase
+				.from('worksession')
+				.update([{ ...workSession }])
+				.eq('id', workSession.id)
+				.select();
+
+			if (error) {
+				throw error;
+			}
+
+			if (data && data.length > 0) {
+				fetchWorkSessions(selectedWeek)
+			}
+		} catch (error) {
+			console.log(error);
+		}
+	}
 
   async function fetchProjects() {
     try {
@@ -76,6 +98,13 @@ export default function WeeklyWorkSessions() {
     }
   }
 
+  const toggleDayCollapse = (day) => {
+    setExpandedDays((prev) => ({
+      ...prev,
+      [day]: !prev[day],
+    }));
+  };
+
   const renderWorkSessionCards = () => {
     const daysOfWeek = [];
     let currentDate = selectedWeek.clone().startOf('week');
@@ -85,32 +114,102 @@ export default function WeeklyWorkSessions() {
       currentDate.add(1, 'day');
     }
 
-    return daysOfWeek.map((day) => (
-      <Col key={day.format('YYYY-MM-DD')} md={6} lg={4} className="mb-4">
-        <h4>{day.format('dddd, MMMM Do')}</h4>
-        {workSessions
-          .filter((session) => moment(session.start_time).isSame(day, 'day'))
-          .map((session) => (
-            <WorkSessionCard key={session.id} workSession={session} projectName={session.projectName} />
-          ))}
-      </Col>
-    ));
+    return daysOfWeek.map((day) => {
+      const daySessions = workSessions.filter((session) => moment(session.start_time).isSame(day, 'day'));
+      const totalHours = daySessions.reduce((total, session) => {
+        const elapsedTime = calculateElapsedTime(session.start_time, session.stop_time);
+        return total + elapsedTime;
+      }, 0);
+
+      const isZeroHours = totalHours === 0;
+      const textColor = isZeroHours ? '#808080' : 'black';
+
+      return (
+        <div key={day.format('YYYY-MM-DD')} className="mb-2">
+          <div
+            className="day-header"
+            style={{ cursor: isZeroHours ? 'default' : 'pointer', padding: '10px 0' }}
+            onClick={() => !isZeroHours && toggleDayCollapse(day.format('YYYY-MM-DD'))}
+          >
+            <Row>
+              <Col xs="auto">
+              <h4 className="float-left mb-0" style={{ color: textColor }}>{day.format('dddd, MMMM Do')}</h4>
+              </Col>
+              <Col>
+              <p className="float-right mb-0" style={{ color: textColor, float:"right", fontSize:"18px"}}><strong>Total Hours: {totalHours.toFixed(2)} hrs</strong></p>
+              </Col>
+            </Row>
+            
+            
+            <div className="clearfix"></div>
+          </div>
+          {!isZeroHours && (
+            <Collapse isOpen={expandedDays[day.format('YYYY-MM-DD')]}>
+              {daySessions.map((session) => (
+                <WorkSessionCard key={session.id} workSession={session} updateWorkSession={updateWorkSession} projectName={session.projectName} />
+              ))}
+            </Collapse>
+          )}
+        </div>
+      );
+    });
   };
+
+  const calculateWeeklyTotals = () => {
+    const totalHours = workSessions.reduce((total, session) => {
+      const elapsedTime = calculateElapsedTime(session.start_time, session.stop_time);
+      return total + elapsedTime;
+    }, 0);
+
+    const billableHours = workSessions.reduce((total, session) => {
+      const elapsedTime = calculateElapsedTime(session.start_time, session.stop_time);
+      const project = projects.find(p => p.id === session.project_id);
+      if (elapsedTime >= 0.25 && project?.billable) {
+        return total + elapsedTime;
+      }
+      return total;
+    }, 0);
+
+    return { totalHours, billableHours };
+  };
+
+  const { totalHours, billableHours } = calculateWeeklyTotals();
+
+  // convert the date to a string
+  const selectedWeekString = selectedWeek.format('MMMM Do, YYYY');
+  const weekStartString = selectedWeek.clone().startOf('week').format('MMMM Do, YYYY');
+  const weekEndString = selectedWeek.clone().endOf('week').format('MMMM Do, YYYY');
 
   return (
     <Container className="mt-5">
       <Row className="mb-4">
         <Col>
-          <h2>Weekly Work Sessions</h2>
-          <Button
+          <Row>
+            <Col>
+             <h2>Week Summary</h2>
+            </Col>
+          </Row>
+          <Row>
+          <Col>
+            <h5>{weekStartString} - {weekEndString}</h5>
+            </Col>
+          </Row>
+        </Col>
+        <Col>
+        <Button
             color="primary"
             onClick={() => setSelectedWeek(selectedWeek.clone().subtract(1, 'week'))}
             className="mr-2"
+            style={{ marginRight: '1rem', width: '100px' }}
           >
-            Previous Week
+            <IconCaretLeft />
           </Button>
-          <Button color="primary" onClick={() => setSelectedWeek(selectedWeek.clone().add(1, 'week'))}>
-            Next Week
+          <Button
+            color="primary"
+            onClick={() => setSelectedWeek(selectedWeek.clone().add(1, 'week'))}
+            style={{ width: '100px' }}
+          >
+            <IconCaretRight />
           </Button>
         </Col>
       </Row>
@@ -122,7 +221,30 @@ export default function WeeklyWorkSessions() {
             <p>No work sessions found for the selected week.</p>
           </Col>
         ) : (
-          renderWorkSessionCards()
+          <>       
+          <Col>{renderWorkSessionCards()}</Col>
+           <Col md={4} className="mt-2 mt-md-0">
+          <Card>
+            <CardBody>
+              {/* center this */}
+              <h4 
+                style={{textAlign:"center"}}
+              >Weekly Totals</h4>
+              <hr></hr>
+              <Row>
+                <Col>
+                  <h5 style={{float:"right"}}>Total Hours: {totalHours.toFixed(2)}</h5>
+                </Col>
+              </Row>
+              <Row>
+                <Col>
+                  <h5 style={{float:"right", color:"green"}}>Billable Hours: {billableHours.toFixed(2)}</h5>
+                </Col>
+              </Row>
+            </CardBody>
+          </Card>
+        </Col></>
+          
         )}
       </Row>
     </Container>

@@ -18,7 +18,7 @@ export default async function Index() {
     >
     <Col xs="auto">
     <h2 className="mt-5">Welcome to Moonstone.</h2>
-    { user ? (<h5>Check out the <Link href='/dashboard'>Dashboard</Link> to start tracking!</h5>) : (<h5>Create an account to begin tracking your project time</h5>)}
+    { user ? (<h5>Check out the <Link href='/dashboard'>Dashboard</Link> to start tracking!</h5>) : (<h5>Create an account to begin tracking your project time.</h5>)}
     </Col>
     <Col xs="auto" 
       //make the contents align to the bottom
