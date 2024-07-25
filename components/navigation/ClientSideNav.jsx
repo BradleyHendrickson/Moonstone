@@ -15,6 +15,7 @@ export default function ClientSideNav({signedIn}) {
 
     const pathname = usePathname()
 
+
     function signOut() {
         const supabase = createClient()
         const {error} = supabase.auth.signOut()
@@ -42,17 +43,9 @@ export default function ClientSideNav({signedIn}) {
         return false
       };
 
-    return (
-        
-        <Navbar color="dark" dark expand="xs">
-        <NavbarBrand href="/">    
-        <Image
-            priority
-            src={logoSvg}
-            alt="Moonstone"
-            width={35}
-        />
-        <span style={{marginLeft:"0.75rem"}}>Moonstone</span></NavbarBrand>
+    const showNav = pathname !== "/login"
+
+    const renderedNav = (
         <Nav className="ml-auto" navbar>
             <NavItem className="d-none d-sm-block">
                 <NavLink 
@@ -75,6 +68,28 @@ export default function ClientSideNav({signedIn}) {
                 {mybutton}
             </NavItem>
         </Nav>
+    )
+
+    return (
+        
+        <Navbar color="dark" dark expand="xs">
+        <NavbarBrand href="/">    
+        <Image
+            priority
+            src={logoSvg}
+            alt="Moonstone"
+            width={35}
+        />
+        <span style={{marginLeft:"0.75rem"}}>Moonstone</span></NavbarBrand>
+        {
+            showNav ? (
+                renderedNav
+            ) :
+            (
+                <></>
+            )
+        }
+
     </Navbar>
     )
 }
