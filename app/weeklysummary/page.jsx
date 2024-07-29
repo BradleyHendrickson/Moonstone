@@ -229,8 +229,8 @@ export default function WeeklyWorkSessions() {
 							<Card>
 								<CardBody>
 									{/* center this */}
-									<h4 style={{ textAlign: 'center' }}>Weekly Totals</h4>
-									<hr></hr>
+									<h4 style={{ textAlign: 'center' }} className='d-none d-md-block'>Weekly Totals</h4>
+									<hr className='d-none d-md-block'></hr>
 									<Row>
 										<Col>
 											<h5 style={{ float: 'right' }}>Total Hours: {totalHours.toFixed(2)}</h5>
