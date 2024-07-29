@@ -50,18 +50,18 @@ export default function ClientSideNav({ signedIn }) {
 
     const renderedMobileNav = (
         <Nav navbar>
-            <NavItem>
-                <NavLink href="/weeklysummary/" active={activeRoute("/weeklysummary")}>
+            <NavItem >
+                <NavLink style={{float:"right"}} href="/weeklysummary/" active={activeRoute("/weeklysummary")}>
                     Weekly Summary
                 </NavLink>
             </NavItem>
             <NavItem>
-                <NavLink href="/dashboard/" active={activeRoute("/dashboard")}>
+                <NavLink style={{float:"right"}} href="/dashboard/" active={activeRoute("/dashboard")}>
                     Dashboard
                 </NavLink>
             </NavItem>
             <NavItem>
-                <Button style={{ marginTop: "0.5rem", marginBottom: "0.5rem" }} color={signedIn ? "secondary" : "success"} onClick={signedIn ? signOut : () => window.location.href = '/login'}>
+                <Button  style={{ marginTop: "0.5rem", marginBottom: "0.5rem", float:"right" }} color={signedIn ? "secondary" : "success"} onClick={signedIn ? signOut : () => window.location.href = '/login'}>
                     {signedIn ? "Log Out" : "Sign In"}
                 </Button>
             </NavItem>
