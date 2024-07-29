@@ -125,10 +125,10 @@ export default function WeeklyWorkSessions() {
 			const textColor = isZeroHours ? '#808080' : 'black';
 
 			return (
-				<div key={day.format('YYYY-MM-DD')} className="mb-2">
+				<div key={day.format('YYYY-MM-DD')} className="mb-1">
 					<div
 						className="day-header"
-						style={{ cursor: isZeroHours ? 'default' : 'pointer', padding: '10px 0' }}
+						style={{ cursor: isZeroHours ? 'default' : 'pointer', padding: '8px 0' }}
 						onClick={() => !isZeroHours && toggleDayCollapse(day.format('YYYY-MM-DD'))}
 					>
 						<Row>
@@ -217,7 +217,18 @@ export default function WeeklyWorkSessions() {
 			</Row>
 			<Row>
 				{loading ? (
-					<Spinner color="primary" />
+					<Row>
+            <Col
+            //center horizontally
+            style={{
+              display: 'flex',
+              justifyContent: 'center',
+            }}
+            >
+            <Spinner color="primary" />
+            </Col>
+            
+          </Row>
 				) : workSessions.length === 0 ? (
 					<Col>
 						<p>No work sessions found for the selected week.</p>
@@ -226,7 +237,7 @@ export default function WeeklyWorkSessions() {
 					<>
 						<Col>{renderWorkSessionCards()}</Col>
 						<Col md={4} className="mt-2 mt-md-0">
-							<Card>
+							<Card className='mb-5'>
 								<CardBody>
 									{/* center this */}
 									<h4 style={{ textAlign: 'center' }} className='d-none d-md-block'>Weekly Totals</h4>
