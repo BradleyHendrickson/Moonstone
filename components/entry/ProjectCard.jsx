@@ -1,33 +1,16 @@
 import React, { useState } from 'react';
 import { Card, CardBody, CardTitle, Button, Row, Col } from 'reactstrap';
-import { IconGripVertical, IconReceipt2, IconCurrencyDollar, IconClock } from '@tabler/icons-react';
+import { IconGripVertical, IconReceipt2, IconCurrencyDollar, IconClock, IconArchive } from '@tabler/icons-react';
+import { createClient } from '@/utils/supabase/client';
 
 import '/components/styles/styles.css';
 
-function ProjectCard({ project, canEdit, setEditingProject, setEditModal, refreshData, startWork, currentWorkSession }) {
+function ProjectCard({ project, canEdit, setEditingProject, setEditModal, refreshData, startWork, currentWorkSession, archiveProject }) {
 	const [isHovered, setIsHovered] = useState(false);
 
-	async function deleteProject(id, user_id) {
-		const supabase = createClient();
-
-		try {
-			let { data, error } = await supabase.from('projects').delete().eq('id', id).eq('user_id', user_id);
-
-			if (error) {
-				throw error;
-			}
-
-			return data;
-		} catch (error) {
-			console.error('Error deleting project:', error);
-			return null;
-		}
-	}
-
 	const handleCardClick = () => {
-
 		if (currentWorkSession?.project_id === project.id) {
-			return
+			return;
 		}
 
 		if (!canEdit) {
@@ -73,17 +56,6 @@ function ProjectCard({ project, canEdit, setEditingProject, setEditModal, refres
 					)}
 					{canEdit && (
 						<Col xs="auto">
-							<Button
-								size="sm"
-								color="danger"
-								style={{ float: 'right', marginLeft: '5px' }}
-								onClick={async () => {
-									await deleteProject(project.id, project.user_id);
-									refreshData('project card');
-								}}
-							>
-								Delete
-							</Button>
 							<Button
 								size="sm"
 								color="secondary"

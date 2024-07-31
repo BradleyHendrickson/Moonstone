@@ -1,0 +1,21 @@
+.project-name {
+	white-space: nowrap;
+	overflow: hidden;
+	text-overflow: ellipsis;
+}
+
+.divider-with-text {
+	position: relative;
+	border: none;
+	border-top: 1px solid #000;
+	text-align: center;
+	margin: 20px 0;
+}
+
+.divider-text {
+	position: relative;
+    top:-42px;
+    
+	padding: 0 10px;
+	border-radius: 5px;
+}

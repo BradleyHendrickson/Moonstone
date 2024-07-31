@@ -95,7 +95,6 @@ export default function ProjectManager() {
 	}
 
 	function startWork(project) {
-
 		//if there is a current work session, finish it
 		if (currentWorkSession) {
 			finishSession(currentWorkSession);
@@ -120,6 +119,7 @@ export default function ProjectManager() {
 			console.log(error);
 		}
 	}
+
 
 	async function getWorkSessions() {
 		try {
@@ -168,7 +168,9 @@ export default function ProjectManager() {
 		try {
 			setLoadingProjects(true);
 
-			let { data, error, status } = await supabase.from('projects').select(`id, created_at, name, description, status, user_id, billable, seq, hidden`);
+			let { data, error, status } = await supabase
+				.from('projects')
+				.select(`id, created_at, name, description, status, user_id, billable, seq, hidden`);
 
 			if (error && status !== 406) {
 				throw error;
@@ -252,7 +254,7 @@ export default function ProjectManager() {
 	const workingOnString = currentProject ? `${currentProject.name}` : 'Select a project to start tracking!';
 
 	const projectLimitAmount = 5;
-  const filteredProjects = projects?.filter((project) => !project.hidden || (canEdit && showAll)) ?? [];
+	const filteredProjects = projects?.filter((project) => !project.hidden) ?? []; //project.hidden 
 	const sortedProjects =
 		filteredProjects?.sort((a, b) => {
 			if (a.billable === b.billable) {
@@ -261,7 +263,7 @@ export default function ProjectManager() {
 			return a.billable ? -1 : 1;
 		}) ?? [];
 
-	const projectsToShow = showAll ? sortedProjects : sortedProjects.slice(0, projectLimitAmount);
+	const projectsToShow = (showAll || canEdit) ? sortedProjects : sortedProjects.slice(0, projectLimitAmount);
 	//get a count of projects hidden
 	const hiddenProjectsCount = sortedProjects.length - projectsToShow.length;
 
@@ -391,7 +393,7 @@ export default function ProjectManager() {
 						projectsToShow.map((project) => (
 							<ProjectCard
 								key={project.id}
-                currentWorkSession = {currentWorkSession}
+								currentWorkSession={currentWorkSession}
 								startWork={startWork}
 								project={project}
 								canEdit={canEdit}
@@ -407,12 +409,12 @@ export default function ProjectManager() {
 							className="d-flex justify-content-center"
 						>
 							<>
-								{!showAll && projects.length > projectLimitAmount && (
+								{!canEdit && !showAll && projects.length > projectLimitAmount && (
 									<Button color="secondary" style={{ width: '50%' }} outline onClick={() => setShowAll(true)} className="mt-3 mb-5">
 										Show More ({hiddenProjectsCount}) <IconCaretDown />
 									</Button>
 								)}
-								{showAll && (
+								{!canEdit && showAll && (
 									<Button color="secondary" style={{ width: '50%' }} onClick={() => setShowAll(false)} className="mt-3  mb-5">
 										Show Less <IconCaretUp />
 									</Button>
@@ -462,14 +464,25 @@ export default function ProjectManager() {
 							</p>
 						</Col>
 					</Row>
-          <Row>
+					<Row>
 						<Col>
-							<p tag="h6" className="mt-0" style={{ float: 'right', color:"Green" }}>
+							<p tag="h6" className="mt-0" style={{ float: 'right', color: 'Green' }}>
 								<strong>Total Billable Hours: {totalBillableHours.toFixed(2)} hrs</strong>
 							</p>
 						</Col>
 					</Row>
 				</Col>
+			</Row>
+			<Row>
+				<div
+					style={
+						{
+							height: '50px',
+						}
+					}
+				>
+
+				</div>
 			</Row>
 		</Container>
 	);

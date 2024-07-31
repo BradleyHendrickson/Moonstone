@@ -40,7 +40,33 @@ export default function EditProjectModal({ isOpen, toggle, user_id, projectData,
         }
     }
 
-    
+    async function archiveProject() {
+            //set the hidden field to true
+            try {
+                let { data, error } = await supabase
+                    .from("projects")
+                    .update({
+                        hidden: true
+                    })
+                    .eq("id", editedProject.id)
+                    .eq("user_id", user_id)
+                    .select()
+                    ;
+
+                console.log('got back from archive', data, error);
+
+                if (error) {
+                    throw error;
+                }
+            } catch (error) {
+                alert("Error archiving project");
+                console.error(error);
+            } finally {
+                refreshData('refreshed upon archive');
+                toggle();
+            }
+        }
+
     async function updateProject() {
         try {
             let { data, error } = await supabase
@@ -98,6 +124,7 @@ export default function EditProjectModal({ isOpen, toggle, user_id, projectData,
             <ModalFooter>
                 <Button color="primary" onClick={updateProject}>Save Changes</Button>{' '}
                 <Button color="secondary" onClick={toggle}>Cancel</Button>
+                <Button color="danger" onClick={archiveProject}>Archive Project</Button>
             </ModalFooter>
         </Modal>
     );

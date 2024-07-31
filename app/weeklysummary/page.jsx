@@ -5,6 +5,7 @@ import moment from 'moment';
 import WorkSessionCard from '@/components/entry/WorkSessionCard';
 import { createClient } from '@/utils/supabase/client';
 import { IconCaretLeft, IconCaretRight } from '@tabler/icons-react';
+import './styles.css';
 
 export default function WeeklyWorkSessions() {
 	const supabase = createClient();
@@ -13,6 +14,7 @@ export default function WeeklyWorkSessions() {
 	const [projects, setProjects] = useState([]);
 	const [loading, setLoading] = useState(false);
 	const [expandedDays, setExpandedDays] = useState({}); // State to track which days are expanded
+	const [viewMode, setViewMode] = useState('daily'); // State to track view mode
 
 	useEffect(() => {
 		fetchProjects();
@@ -158,6 +160,67 @@ export default function WeeklyWorkSessions() {
 		});
 	};
 
+	const renderProjectTotals = () => {
+		const projectTotals = workSessions.reduce((acc, session) => {
+			const elapsedTime = calculateElapsedTime(session.start_time, session.stop_time);
+			if (!acc[session.project_id]) {
+				acc[session.project_id] = { projectName: session.projectName, totalHours: 0 };
+			}
+			acc[session.project_id].totalHours += elapsedTime;
+			return acc;
+		}, {});
+	
+		const sortedProjects = Object.values(projectTotals).sort((a, b) => {
+			const projectA = projects.find((p) => p.name === a.projectName);
+			const projectB = projects.find((p) => p.name === b.projectName);
+			if (projectA?.billable && !projectB?.billable) {
+				return -1;
+			}
+			if (!projectA?.billable && projectB?.billable) {
+				return 1;
+			}
+			return 0;
+		});
+	
+		let dividerInserted = false;
+	
+		return sortedProjects.map((project, index) => {
+			const projectData = projects.find((p) => p.name === project.projectName);
+			const isBillable = projectData?.billable;
+	
+			const divider = !dividerInserted && !isBillable ? (
+				<div>
+					<h6 className="text-center mb-0">Non-Billable Projects</h6>
+					<hr className='mb-4 mt-1' />
+					
+				</div>
+			) : null;
+			
+	
+			if (!dividerInserted && !isBillable) {
+				dividerInserted = true;
+			}
+	
+			return (
+				<React.Fragment key={project.projectName}>
+					{divider}
+					<div className="mb-2">
+						<Row className="align-items-center">
+							<Col className="d-flex">
+								<h5 className="mb-0 flex-grow-1 project-name">{project.projectName}</h5>
+								<p className="mb-0 ml-auto text-right" style={{ fontSize: '18px' }}>
+									<strong>{project.totalHours.toFixed(2)} hrs</strong>
+								</p>
+							</Col>
+						</Row>
+					</div>
+				</React.Fragment>
+			);
+		});
+	};
+	
+	
+	
 	const calculateWeeklyTotals = () => {
 		const totalHours = workSessions.reduce((total, session) => {
 			const elapsedTime = calculateElapsedTime(session.start_time, session.stop_time);
@@ -203,13 +266,19 @@ export default function WeeklyWorkSessions() {
 				<Col xs="12">
 					<Row>
 						<Col xs="6" sm="auto">
-							<Button color="secondary" onClick={() => setSelectedWeek(selectedWeek.clone().subtract(1, 'week'))} style={{ width: '100%', minWidth:"150px" }}>
+							<Button color="secondary" onClick={() => setSelectedWeek(selectedWeek.clone().subtract(1, 'week'))} style={{ width: '100%', minWidth: "150px" }} className='mb-2'>
 								<IconCaretLeft />
 							</Button>
 						</Col>
-						<Col xs="6"  sm="auto">
-							<Button color="secondary" onClick={() => setSelectedWeek(selectedWeek.clone().add(1, 'week'))} style={{ width: '100%', minWidth:"150px"  }}>
+						<Col xs="6" sm="auto">
+							<Button color="secondary" onClick={() => setSelectedWeek(selectedWeek.clone().add(1, 'week'))} style={{ width: '100%', minWidth: "150px" }} className='mb-2'>
 								<IconCaretRight />
+							</Button>
+						</Col>
+						<Col xs="12" sm="auto" >
+							<Button color="secondary" outline 
+							onClick={() => setViewMode(viewMode === 'daily' ? 'project' : 'daily')} style={{ width: '100%', minWidth: "200px" }}>
+								{viewMode === 'daily' ? 'View Totals by Project' : 'View Daily Totals'}
 							</Button>
 						</Col>
 					</Row>
@@ -218,24 +287,23 @@ export default function WeeklyWorkSessions() {
 			<Row>
 				{loading ? (
 					<Row>
-            <Col
-            //center horizontally
-            style={{
-              display: 'flex',
-              justifyContent: 'center',
-            }}
-            >
-            <Spinner color="primary" />
-            </Col>
-            
-          </Row>
+						<Col
+							// center horizontally
+							style={{
+								display: 'flex',
+								justifyContent: 'center',
+							}}
+						>
+							<Spinner color="primary" />
+						</Col>
+					</Row>
 				) : workSessions.length === 0 ? (
 					<Col>
 						<p>No work sessions found for the selected week.</p>
 					</Col>
 				) : (
 					<>
-						<Col>{renderWorkSessionCards()}</Col>
+						<Col>{viewMode === 'daily' ? renderWorkSessionCards() : renderProjectTotals()}</Col>
 						<Col md={4} className="mt-2 mt-md-0">
 							<Card className='mb-5'>
 								<CardBody>

@@ -46,7 +46,7 @@ export default function Login() {
 
     if (!error && data) {
       // redirect to /
-      window.location.href = '/'
+      window.location.href = '/dashboard'
     }
   }
   

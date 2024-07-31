@@ -3,7 +3,7 @@ import React from 'react';
 
 import {Container, Card, CardBody, CardTitle, CardText, CardSubtitle, Button, Row, Col, FormGroup, Label, Input} from 'reactstrap';
 
-import { createClient } from '@/utils/supabase/client'; // Adjust import path based on your project structure
+import { createClient } from '@/utils/supabase/client'; 
 
 export async function login(credentials) {
   const supabase = createClient();
