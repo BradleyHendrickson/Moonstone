@@ -122,9 +122,9 @@ export default function EditProjectModal({ isOpen, toggle, user_id, projectData,
                 </Form>
             </ModalBody>
             <ModalFooter>
+                <Button color="danger" onClick={archiveProject}>Archive Project</Button>
                 <Button color="primary" onClick={updateProject}>Save Changes</Button>{' '}
                 <Button color="secondary" onClick={toggle}>Cancel</Button>
-                <Button color="danger" onClick={archiveProject}>Archive Project</Button>
             </ModalFooter>
         </Modal>
     );
