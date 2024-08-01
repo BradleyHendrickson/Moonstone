@@ -6,7 +6,7 @@ import WorkSessionCard from '@/components/entry/WorkSessionCard';
 import { createClient } from '@/utils/supabase/client';
 import { IconCaretLeft, IconCaretRight } from '@tabler/icons-react';
 import './styles.css';
-
+import { poppins } from '@/utils/fonts';
 export default function WeeklyWorkSessions() {
 	const supabase = createClient();
 	const [selectedWeek, setSelectedWeek] = useState(moment().startOf('week')); // Default to current week
@@ -141,7 +141,7 @@ export default function WeeklyWorkSessions() {
 							</Col>
 							<Col>
 								<p className="float-right mb-0" style={{ color: textColor, float: 'right', fontSize: '18px' }}>
-									<strong>{totalHours.toFixed(2)} hrs</strong>
+									<strong className={poppins.className}>{totalHours.toFixed(2)} hrs</strong>
 								</p>
 							</Col>
 						</Row>
@@ -209,7 +209,7 @@ export default function WeeklyWorkSessions() {
 							<Col className="d-flex">
 								<h5 className="mb-0 flex-grow-1 project-name">{project.projectName}</h5>
 								<p className="mb-0 ml-auto text-right" style={{ fontSize: '18px' }}>
-									<strong>{project.totalHours.toFixed(2)} hrs</strong>
+									<strong className={poppins.className}>{project.totalHours.toFixed(2)} hrs</strong>
 								</p>
 							</Col>
 						</Row>
@@ -312,12 +312,12 @@ export default function WeeklyWorkSessions() {
 									<hr className='d-none d-md-block'></hr>
 									<Row>
 										<Col>
-											<h5 style={{ float: 'right' }}>Total Hours: {totalHours.toFixed(2)}</h5>
+											<h5 style={{ float: 'right' }} className={poppins.className}><strong>Total Hours: {totalHours.toFixed(2)}</strong></h5>
 										</Col>
 									</Row>
 									<Row>
 										<Col>
-											<h5 style={{ float: 'right', color: 'green' }}>Billable Hours: {billableHours.toFixed(2)}</h5>
+											<h5 style={{ float: 'right', color: 'green' }} className={poppins.className}><strong>Billable Hours: {billableHours.toFixed(2)}</strong></h5>
 										</Col>
 									</Row>
 								</CardBody>

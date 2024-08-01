@@ -1,12 +1,12 @@
 
 import type { Metadata } from "next";
-import { Inter } from "next/font/google";
+
 import "./globals.css";
 import 'bootstrap/dist/css/bootstrap.min.css';
 import TopNav from '../components/navigation/topnav'
+import { poppins } from "@/utils/fonts";
+ 
 
-
-const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
   title: "Moonstone",
@@ -20,10 +20,9 @@ export default function RootLayout({
 }>) {
   return (
     <html lang='en'>
-      <body>
-          <TopNav />
-          {children}
-
+      <body className={poppins.className}>
+        <TopNav />
+        {children}
       </body>
     </html>
   );

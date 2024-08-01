@@ -3,6 +3,9 @@ import { Card, CardBody, CardTitle, CardText, Row, Col } from 'reactstrap';
 import moment from 'moment'; // Ensure moment.js is installed
 import { IconPencil } from '@tabler/icons-react';
 import EditWorkSessionModal from './EditWorkSessionModal';
+import { poppins } from '@/utils/fonts';
+
+  
 
 const WorkSessionCard = ({ workSession, projectName, updateWorkSession }) => {
     const formatTime = (time) => {
@@ -38,7 +41,7 @@ const WorkSessionCard = ({ workSession, projectName, updateWorkSession }) => {
     }
 
     return (
-        <div key={workSession.id} className="mt-2">
+        <div key={workSession.id} style={{marginTop: "0.5em"}} className={poppins.className}>
             <CardBody onClick={toggle}
                 onMouseEnter={handleMouseEnter}
                 onMouseLeave={handleMouseLeave}

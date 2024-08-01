@@ -10,6 +10,8 @@ import { IconPlus, IconPencil, IconCheck, IconCaretDown, IconCaretUp } from '@ta
 import ProjectCard from '@/components/entry/ProjectCard';
 import WorkSessionCard from '@/components/entry/WorkSessionCard';
 import moment from 'moment';
+import { poppins } from '@/utils/fonts';
+
 
 function createGreetingString(currentTime, userName) {
 	if (currentTime < 12) {
@@ -460,14 +462,14 @@ export default function ProjectManager() {
 					<Row>
 						<Col>
 							<p tag="h6" className="mt-3 mb-1" style={{ float: 'right' }}>
-								<strong>Total Hours: {totalHours.toFixed(2)} hrs</strong>
+								<strong className={poppins.className}>Total Hours: {totalHours.toFixed(2)} hrs</strong>
 							</p>
 						</Col>
 					</Row>
 					<Row>
 						<Col>
 							<p tag="h6" className="mt-0" style={{ float: 'right', color: 'Green' }}>
-								<strong>Total Billable Hours: {totalBillableHours.toFixed(2)} hrs</strong>
+								<strong className={poppins.className}>Total Billable Hours: {totalBillableHours.toFixed(2)} hrs</strong>
 							</p>
 						</Col>
 					</Row>

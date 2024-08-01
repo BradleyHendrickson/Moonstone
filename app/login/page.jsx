@@ -5,7 +5,13 @@ import "../globals.css";
 //import { login, signup, signUpUser, signInUser } from './actions'
 import { Container, Card, CardTitle, Row, Col, Button, Form, FormGroup, Label, Input, CardBody, Alert} from 'reactstrap';
 import { createClient } from '@/utils/supabase/client'
+import { Lora, Prompt, Inter } from 'next/font/google'
 
+const prompt = Prompt({
+  subsets: ['latin'],
+  weight: ['400', '700'], // You can specify the weights you need
+  display: 'swap',
+});
 
 export default function Login() {
   const supabase = createClient()
@@ -67,7 +73,7 @@ export default function Login() {
         }}
       ></div>
       
-    <Container>
+    <Container className={prompt.className}>
       <script src="https://accounts.google.com/gsi/client" async></script>
     <Row>
       <Col style={{
@@ -75,7 +81,7 @@ export default function Login() {
           justifyContent: 'center',
       }}>
         <Card className='mt-5' style={{width:"400px"}}>
-        <CardTitle tag="h5" className="text-center mt-3">Login to Moonstone</CardTitle>
+        <CardTitle tag="h5" className="text-center mt-3"><strong>Login to Moonstone</strong></CardTitle>
             <CardBody>
 
               <Row>
