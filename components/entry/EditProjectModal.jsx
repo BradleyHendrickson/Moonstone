@@ -110,7 +110,7 @@ export default function EditProjectModal({ isOpen, toggle, user_id, projectData,
 
     return (
         <Modal isOpen={isOpen} toggle={toggle}>
-            <ModalHeader toggle={toggle}>Edit Project</ModalHeader>
+            <ModalHeader toggle={toggle}><strong>Edit Project</strong></ModalHeader>
             <ModalBody>
                 <Form>
                     <FormGroup>
@@ -136,7 +136,7 @@ export default function EditProjectModal({ isOpen, toggle, user_id, projectData,
             <ModalFooter>
                 <ButtonSpinner color="danger" onClick={archiveProject} loading={loadingArchiveProject} disabled={loading} style={{width:"150px"}}>Archive Project</ButtonSpinner>
                 <ButtonSpinner color="primary" onClick={updateProject} loading={loadingUpdateProject} disabled={loading} style={{width:"150px"}}>Save Changes</ButtonSpinner>
-                <Button color="secondary" onClick={toggle} disabled={loading}>Cancel</Button>
+                <Button color="secondary" onClick={toggle} disabled={loading} style={{width:"150px"}}>Cancel</Button>
             </ModalFooter>
         </Modal>
     );

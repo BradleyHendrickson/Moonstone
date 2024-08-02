@@ -4,7 +4,7 @@ import React, { useEffect, useState } from 'react';
 import moment from 'moment'; // Ensure moment.js is installed
 import { IconPencil } from '@tabler/icons-react';
 
-export default function StartedTime({ startTime, updateStartTime }) {
+export default function StartedTime({ startTime, updateStartTime, muted }) {
 	const [isHovered, setIsHovered] = useState(false);
 	const [modal, setModal] = useState(false);
 	const [newStartTime, setNewStartTime] = useState(startTime);
@@ -34,7 +34,7 @@ export default function StartedTime({ startTime, updateStartTime }) {
 
 	return (
 		<>
-			<p
+			<p	
 				className='mb-0 mt-0 text-muted'
 				style={{ float: "right", cursor: 'pointer', textDecoration: isHovered ? 'underline' : 'none' }}
 				onMouseEnter={handleMouseEnter}

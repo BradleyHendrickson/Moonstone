@@ -309,8 +309,9 @@ export default function ProjectManager() {
 						<CardBody>
 							<Row>
 								<Col>
-									<h5
-										className="mt-0"
+									<h5	
+										//use text-muted if canEdit
+										className={canEdit ? 'text-muted mt-0' : 'mt-0'}
 										style={{
 											whiteSpace: 'nowrap',
 											overflow: 'hidden',
@@ -321,7 +322,7 @@ export default function ProjectManager() {
 									</h5>
 								</Col>
 								<Col>
-									<StartedTime startTime={currentWorkSession?.start_time} updateStartTime={updateStartTime} />
+									<StartedTime startTime={currentWorkSession?.start_time} updateStartTime={updateStartTime} mmuted={canEdit}/>
 								</Col>
 							</Row>
 							<Row>
@@ -329,7 +330,7 @@ export default function ProjectManager() {
 									{currentWorkSession ? (
 										<Row>
 											<Col>
-												<LiveTimeCounter startTime={currentWorkSession?.start_time} />
+												<LiveTimeCounter startTime={currentWorkSession?.start_time} muted={canEdit} />
 											</Col>
 											<Col>
 												<Button style={{ float: 'right' }} color="success" onClick={() => finishSession(currentWorkSession)}>
@@ -340,7 +341,9 @@ export default function ProjectManager() {
 											{/* <Button color="danger">Pause</Button> */}
 										</Row>
 									) : (
-										'Not working on anything at the moment'
+										<p 
+										className={canEdit ? 'text-muted mt-0' : 'mt-0'}
+										>Not working on anything at the moment </p>
 									)}
 								</Col>
 							</Row>

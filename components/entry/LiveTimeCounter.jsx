@@ -2,7 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import moment from 'moment';
 
-export default function LiveTimeCounter({ startTime }) {
+export default function LiveTimeCounter({ startTime, muted }) {
     const [timeDiff, setTimeDiff] = useState(moment().diff(startTime));
 
     useEffect(() => {
@@ -20,7 +20,7 @@ export default function LiveTimeCounter({ startTime }) {
 
     return (
         <div>
-            <h2> {formattedTimeDiff}</h2>
+            <h2 className={muted ? 'text-muted' : ''}> {formattedTimeDiff}</h2>
         </div>
     );
 }

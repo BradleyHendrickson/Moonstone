@@ -68,7 +68,7 @@ export default function AddProjectModal({isOpen, toggle, user_id, refreshData}) 
 
     return (
         <Modal isOpen={isOpen} toggle={toggle}>
-            <ModalHeader toggle={toggle}>Add a Project</ModalHeader>
+            <ModalHeader toggle={toggle}><strong>Add a Project</strong></ModalHeader>
             <ModalBody>
                 <Form >
                     <FormGroup>
