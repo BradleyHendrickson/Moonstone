@@ -11,7 +11,7 @@ import ProjectCard from '@/components/entry/ProjectCard';
 import WorkSessionCard from '@/components/entry/WorkSessionCard';
 import moment from 'moment';
 import { poppins } from '@/utils/fonts';
-
+import StartedTime from '@/components/entry/StartedTime';
 
 function createGreetingString(currentTime, userName) {
 	if (currentTime < 12) {
@@ -45,6 +45,14 @@ export default function ProjectManager() {
 		const hours = duration.asHours();
 		return Math.round(hours * 4) / 4; // Round to nearest 0.25
 	};
+
+	function updateStartTime(newStartTime) {
+		const updatedWorkSession = {
+			...currentWorkSession,
+			start_time: newStartTime
+		};
+		updateWorkSession(updatedWorkSession);
+	}
 
 	async function updateWorkSession(workSession) {
 		try {
@@ -121,7 +129,6 @@ export default function ProjectManager() {
 			console.log(error);
 		}
 	}
-
 
 	async function getWorkSessions() {
 		try {
@@ -256,7 +263,7 @@ export default function ProjectManager() {
 	const workingOnString = currentProject ? `${currentProject.name}` : 'Select a project to start tracking!';
 
 	const projectLimitAmount = 5;
-	const filteredProjects = projects?.filter((project) => !project.hidden) ?? []; //project.hidden 
+	const filteredProjects = projects?.filter((project) => !project.hidden) ?? []; //project.hidden
 	const sortedProjects =
 		filteredProjects?.sort((a, b) => {
 			if (a.billable === b.billable) {
@@ -265,7 +272,7 @@ export default function ProjectManager() {
 			return a.billable ? -1 : 1;
 		}) ?? [];
 
-	const projectsToShow = (showAll || canEdit) ? sortedProjects : sortedProjects.slice(0, projectLimitAmount);
+	const projectsToShow = showAll || canEdit ? sortedProjects : sortedProjects.slice(0, projectLimitAmount);
 	//get a count of projects hidden
 	const hiddenProjectsCount = sortedProjects.length - projectsToShow.length;
 
@@ -299,6 +306,9 @@ export default function ProjectManager() {
 									>
 										{workingOnString}
 									</h5>
+								</Col>
+								<Col>
+									<StartedTime startTime={currentWorkSession?.start_time} updateStartTime={updateStartTime} />
 								</Col>
 							</Row>
 							<Row>
@@ -477,14 +487,10 @@ export default function ProjectManager() {
 			</Row>
 			<Row>
 				<div
-					style={
-						{
-							height: '50px',
-						}
-					}
-				>
-
-				</div>
+					style={{
+						height: '50px'
+					}}
+				></div>
 			</Row>
 		</Container>
 	);
