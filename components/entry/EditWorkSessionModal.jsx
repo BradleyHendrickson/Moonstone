@@ -1,76 +1,95 @@
-
-
-import {React, useEffect, useState} from 'react';
-import {Modal, ModalHeader, ModalBody, ModalFooter, Button, FormGroup, Label, Input, Row, Col} from 'reactstrap';
+import { React, useEffect, useState } from 'react';
+import { Modal, ModalHeader, ModalBody, ModalFooter, Button, FormGroup, Label, Input, Row, Col } from 'reactstrap';
 import moment from 'moment';
+import ButtonSpinner from '@/components/interface/ButtonSpinner';
 
 export default function EditWorkSessionModal({ workSession, projectName, isOpen, toggle, updateWorkSession }) {
-    const [start_time, setStartTime] = useState(workSession.start_time);
-    const [stop_time, setStopTime] = useState(workSession.stop_time);
+    const [startTime, setStartTime] = useState('');
+    const [stopTime, setStopTime] = useState('');
     const [description, setDescription] = useState(workSession.description);
+    const [loadingUpdate, setLoadingUpdate] = useState(false);
 
     useEffect(() => {
-        // convert start time and stop time to a format that works with the time input field
-        // it comes in as "2024-07-17T15:50:58.315+00:00"
-        // we want to extract the time portion and convert it to "15:50"
-        // "yyyy-MM-ddThh:mm" in local timezone
-        const convertedStartTime = moment(workSession.start_time).format('YYYY-MM-DDTHH:mm');
-        const convertedStopTime = moment(workSession.stop_time).format('YYYY-MM-DDTHH:mm');
+        // Extract the time portion from the start and stop times
+        const initialStartTime = moment(workSession.start_time).format('HH:mm');
+        const initialStopTime = moment(workSession.stop_time).format('HH:mm');
 
+        setStartTime(initialStartTime);
+        setStopTime(initialStopTime);
+    }, [isOpen, workSession.start_time, workSession.stop_time]);
 
+    const handleUpdate = async () => {
+        setLoadingUpdate(true);
 
-        setStartTime(convertedStartTime);
-        setStopTime(convertedStopTime);
+        // Combine the date part from the original timestamp with the updated time part
+        const newStartTime = moment(workSession.start_time).format('YYYY-MM-DD') + 'T' + startTime;
+        const newStopTime = moment(workSession.stop_time).format('YYYY-MM-DD') + 'T' + stopTime;
 
-    }, [isOpen]);
+        console.log("start time: ", newStartTime);
+        console.log("stop time: ", newStopTime);
 
-    const handleUpdate = () => {
-        console.log("start time: ", start_time);
-        console.log("stop time: ", stop_time);
-        updateWorkSession({
+        // Convert to ISO format with the correct timezone offset
+        const adjustedStartTime = moment(newStartTime).toISOString();
+        const adjustedStopTime = moment(newStopTime).toISOString();
+
+        await updateWorkSession({
             id: workSession.id,
-            start_time: new Date(start_time).toISOString(),
-            stop_time: new Date(stop_time).toISOString(),
+            start_time: adjustedStartTime,
+            stop_time: adjustedStopTime,
             description: description
         });
+
+        setLoadingUpdate(false);
         toggle();
     }
 
-    function updateStartTime(e) {
-        setStartTime(moment(e.target.value).format('YYYY-MM-DDTHH:mm'));
+    const updateStartTime = (e) => {
+        setStartTime(e.target.value);
     }
 
-    function updateStopTime(e) {
-        setStopTime(moment(e.target.value).format('YYYY-MM-DDTHH:mm'));
+    const updateStopTime = (e) => {
+        setStopTime(e.target.value);
     }
 
     return (
         <Modal isOpen={isOpen} toggle={toggle}>
-            <ModalHeader toggle={toggle}>Edit Work Session</ModalHeader>
+            <ModalHeader toggle={toggle}><strong>Edit Work Session</strong></ModalHeader>
             <ModalBody>
-                <h3>{projectName}</h3>
                 <Row>
                     <Col>
-                    <FormGroup>
-                    <Label for="start_time">Start Time</Label>
-                    <Input type="datetime-local" name="start_time" id="start_time" value={start_time} onChange={updateStartTime} />
-                </FormGroup>
-                    </Col>
-                    <Col>
-                    <FormGroup>
-                    <Label for="stop_time">Stop Time</Label>
-                    <Input type="datetime-local" name="stop_time" id="stop_time" value={stop_time} onChange={updateStopTime} />
-                </FormGroup>
+                        <FormGroup>
+                            <Label for="project">Project</Label>
+                            <Input type="text" name="project" id="project" value={projectName} disabled />
+                        </FormGroup>
                     </Col>
                 </Row>
-
-
+                <Row>
+                    <Col>
+                        <FormGroup>
+                            <Label for="start_time">Start Time</Label>
+                            <Input type="time" name="start_time" id="start_time" value={startTime} onChange={updateStartTime} disabled={loadingUpdate} />
+                        </FormGroup>
+                    </Col>
+                    <Col>
+                        <FormGroup>
+                            <Label for="stop_time">Stop Time</Label>
+                            <Input type="time" name="stop_time" id="stop_time" value={stopTime} onChange={updateStopTime} disabled={loadingUpdate} />
+                        </FormGroup>
+                    </Col>
+                </Row>
             </ModalBody>
             <ModalFooter>
-                <Button color="primary" onClick={handleUpdate}>Update</Button>{' '}
-                <Button color="secondary" onClick={toggle}>Cancel</Button>
+                <ButtonSpinner
+                    loading={loadingUpdate}
+                    disabled={loadingUpdate}
+                    color="primary"
+                    onClick={handleUpdate}
+                    style={{ width: "150px" }}
+                >
+                    Update
+                </ButtonSpinner>
+                <Button style={{ width: "150px" }} disabled={loadingUpdate} color="secondary" onClick={toggle}>Cancel</Button>
             </ModalFooter>
         </Modal>
     );
-
 }

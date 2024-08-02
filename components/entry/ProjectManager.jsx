@@ -12,6 +12,8 @@ import WorkSessionCard from '@/components/entry/WorkSessionCard';
 import moment from 'moment';
 import { poppins } from '@/utils/fonts';
 import StartedTime from '@/components/entry/StartedTime';
+//import ButtonSpinner from '../interface/ButtonSpinner';
+import LoadingPlaceholder from '../interface/LoadingPlaceholder';
 
 function createGreetingString(currentTime, userName) {
 	if (currentTime < 12) {
@@ -28,8 +30,8 @@ export default function ProjectManager() {
 
 	const [user, setUser] = useState(null);
 	const [projects, setProjects] = useState([]);
-	const [loadingProjects, setLoadingProjects] = useState(false);
-	const [loadingWorkSessions, setLoadingWorkSessions] = useState(false);
+	const [loadingProjects, setLoadingProjects] = useState(true);
+	const [loadingWorkSessions, setLoadingWorkSessions] = useState(true);
 	const [canEdit, setCanEdit] = useState(false);
 	const [editingProject, setEditingProject] = useState(null);
 	const [createModal, setCreateModal] = useState(false);
@@ -37,6 +39,11 @@ export default function ProjectManager() {
 	const [currentWorkSession, setCurrentWorkSession] = useState(null);
 	const [workSessions, setWorkSessions] = useState([]);
 	const [showAll, setShowAll] = useState(false);
+
+	const [initialProjectLoad, setInitialProjectLoad] = useState(true);
+	const [initialWorkSessionLoad, setInitialWorkSessionLoad] = useState(true);
+
+	const [loadingStartTime, setLoadingStartTime] = useState(false);
 
 	const calculateElapsedTime = (startTime, stopTime) => {
 		const start = moment(startTime);
@@ -61,17 +68,19 @@ export default function ProjectManager() {
 				.update([{ ...workSession }])
 				.eq('id', workSession.id)
 				.select();
-
+	
 			if (error) {
 				throw error;
 			}
-
+	
 			if (data && data.length > 0) {
 				refreshData('user useeffect');
 				setCurrentWorkSession(null);
 			}
 		} catch (error) {
 			console.log(error);
+		} finally {
+
 		}
 	}
 
@@ -133,6 +142,7 @@ export default function ProjectManager() {
 	async function getWorkSessions() {
 		try {
 			setLoadingWorkSessions(true);
+
 			const startOfToday = new Date();
 			startOfToday.setHours(0, 0, 0, 0); // Set to midnight of today
 
@@ -163,6 +173,7 @@ export default function ProjectManager() {
 			console.log(error);
 		} finally {
 			setLoadingWorkSessions(false);
+			setInitialWorkSessionLoad(false);
 		}
 	}
 
@@ -176,6 +187,7 @@ export default function ProjectManager() {
 	async function getProjects() {
 		try {
 			setLoadingProjects(true);
+			
 
 			let { data, error, status } = await supabase
 				.from('projects')
@@ -192,6 +204,7 @@ export default function ProjectManager() {
 			//alert("Error loading messages!");
 			console.log(error);
 		} finally {
+			setInitialProjectLoad(false);
 			setLoadingProjects(false);
 		}
 	}
@@ -390,17 +403,16 @@ export default function ProjectManager() {
 							</Button>
 						</Col>
 					</Row>
+					
+					{loadingProjects && initialProjectLoad && (!projects || projects.length == 0) ? (
+						<>
+						<LoadingPlaceholder width='100%' height='45px' cornerRadius='5px' className='mt-2'/>
+						<LoadingPlaceholder width='100%' height='45px' cornerRadius='5px' className='mt-2' />
+						<LoadingPlaceholder width='100%' height='45px' cornerRadius='5px' className='mt-2'/>
+						<LoadingPlaceholder width='100%' height='45px' cornerRadius='5px' className='mt-2'/>
+						<LoadingPlaceholder width='100%' height='45px' cornerRadius='5px' className='mt-2'/>
+						</>
 
-					{loadingProjects && (!projects || projects.length == 0) ? (
-						<div
-							//center the spinner
-							style={{
-								display: 'flex',
-								justifyContent: 'center'
-							}}
-						>
-							<Spinner color="primary" size={'lg'} />
-						</div>
 					) : (
 						projectsToShow.map((project) => (
 							<ProjectCard
@@ -440,16 +452,13 @@ export default function ProjectManager() {
 					<p className="mt-0 mb-4" style={{ fontSize: '14px', color: 'grey' }}>
 						<strong>Rounded to the nearest 15 min</strong>
 					</p>
-					{loadingWorkSessions && (!workSessions || workSessions.length == 0) ? (
-						<div
-							//center the spinner
-							style={{
-								display: 'flex',
-								justifyContent: 'center'
-							}}
-						>
-							<Spinner color="primary" size={'lg'} />
-						</div>
+					{loadingWorkSessions && initialWorkSessionLoad && (!workSessions || workSessions.length == 0) ? (
+						<>
+						<LoadingPlaceholder width='100%' height='23px' cornerRadius='2px' className='mt-2' />
+						<LoadingPlaceholder width='100%' height='23px' cornerRadius='2px' className='mt-2'/>
+						<LoadingPlaceholder width='100%' height='23px' cornerRadius='2px' className='mt-2'/>
+						<LoadingPlaceholder width='100%' height='23px' cornerRadius='2px' className='mt-2' />
+						</>
 					) : (
 						workSessions
 							?.sort((a, b) => new Date(a.start_time).getTime() - new Date(b.start_time).getTime())
@@ -471,16 +480,32 @@ export default function ProjectManager() {
 
 					<Row>
 						<Col>
-							<p tag="h6" className="mt-3 mb-1" style={{ float: 'right' }}>
-								<strong className={poppins.className}>Total Hours: {totalHours.toFixed(2)} hrs</strong>
-							</p>
+							{
+								(loadingWorkSessions && initialWorkSessionLoad) ? (
+									<LoadingPlaceholder width='200px' height='23px' cornerRadius='2px' className="mt-2 mb-0" style={{float:"right"}}/>
+								)
+								:
+								(
+									<p tag="h6" className="mt-3 mb-0" style={{ float: 'right' }}>
+										<strong className={poppins.className}>Total Hours: {totalHours.toFixed(2)} hrs</strong>
+									</p>
+								)
+							}
 						</Col>
 					</Row>
 					<Row>
 						<Col>
-							<p tag="h6" className="mt-0" style={{ float: 'right', color: 'Green' }}>
-								<strong className={poppins.className}>Total Billable Hours: {totalBillableHours.toFixed(2)} hrs</strong>
-							</p>
+							{
+								(loadingWorkSessions && initialWorkSessionLoad) ? (
+									<LoadingPlaceholder width='200px' height='23px' cornerRadius='2px' className="mt-2" style={{float:"right"}} />
+								)
+								:
+								(
+									<p tag="h6" className="mt-0" style={{ float: 'right', color: "green" }}>
+										<strong className={poppins.className}>Billable Hours: {totalBillableHours.toFixed(2)} hrs</strong>
+									</p>
+								)
+							}
 						</Col>
 					</Row>
 				</Col>

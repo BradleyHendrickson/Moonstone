@@ -41,7 +41,7 @@ const WorkSessionCard = ({ workSession, projectName, updateWorkSession }) => {
     }
 
     return (
-        <div key={workSession.id} style={{marginTop: "0.5em"}} className={poppins.className}>
+        <div key={workSession.id} style={{marginTop: "0.5rem"}} className={poppins.className}>
             <CardBody onClick={toggle}
                 onMouseEnter={handleMouseEnter}
                 onMouseLeave={handleMouseLeave}

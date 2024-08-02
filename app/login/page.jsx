@@ -8,7 +8,6 @@ import { createClient } from '@/utils/supabase/client'
 import { Lora, Prompt, Inter } from 'next/font/google'
 import ButtonSpinner from '@/components/interface/ButtonSpinner'
 
-
 const prompt = Prompt({
   subsets: ['latin'],
   weight: ['400', '700'], // You can specify the weights you need
@@ -82,6 +81,11 @@ export default function Login() {
 
   const loading = loadingSignIn || loadingSignUp
 
+  const handleSubmit = (e) => {
+    e.preventDefault()
+    signInWithEmail()
+  }
+
   return (
     <>
       <div
@@ -107,71 +111,72 @@ export default function Login() {
         <Card className='mt-5' style={{width:"400px"}}>
         <CardTitle tag="h5" className="text-center mt-3"><strong>Login to Moonstone</strong></CardTitle>
             <CardBody>
-
-              <Row>
-                <Col>
-                  <FormGroup>
-                    <Label for="email">Email</Label>
-                    <Input 
-                      type="email" 
-                      name="email" 
-                      id="email" 
-                      placeholder="Email" 
-                      value={email} 
-                      onChange={(e) => setEmail(e.target.value)} 
+              <Form onSubmit={handleSubmit}>
+                <Row>
+                  <Col>
+                    <FormGroup>
+                      <Label for="email">Email</Label>
+                      <Input 
+                        type="email" 
+                        name="email" 
+                        id="email" 
+                        placeholder="Email" 
+                        value={email} 
+                        onChange={(e) => setEmail(e.target.value)} 
+                        disabled={loading} 
+                      />
+                    </FormGroup>
+                  </Col>
+                </Row>
+                <Row>
+                  <Col>
+                    <FormGroup>
+                      <Label for="password">Password</Label>
+                      <Input 
+                        type="password" 
+                        name="password" 
+                        id="password" 
+                        placeholder="Password" 
+                        value={password} 
+                        onChange={(e) => setPassword(e.target.value)} 
+                        disabled={loading}
+                      />
+                    </FormGroup>
+                  </Col>
+                </Row>
+                <Row>
+                  <Col>
+                    { (message && !successMessage) && <Alert className="p-2" color="danger">{message}</Alert> }
+                    { successMessage && <Alert className="p-2" color="success">{successMessage}</Alert> }
+                  </Col>
+                </Row>
+                <Row>
+                  <Col>
+                    <ButtonSpinner 
+                      loading={loadingSignUp} 
                       disabled={loading} 
-                      />
-                  </FormGroup>
-                </Col>
-              </Row>
-              <Row>
-                <Col>
-                  <FormGroup>
-                    <Label for="password">Password</Label>
-                    <Input 
-                      type="password" 
-                      name="password" 
-                      id="password" 
-                      placeholder="Password" 
-                      value={password} 
-                      onChange={(e) => setPassword(e.target.value)} 
-                      disabled={loading}
-                      />
-                  </FormGroup>
-                </Col>
-              </Row>
-              <Row>
-                <Col>
-                  { (message && !successMessage) && <Alert className="p-2" color="danger">{message}</Alert> }
-                  { successMessage && <Alert className="p-2" color="success">{successMessage}</Alert> }
-                </Col>
-              </Row>
-              <Row>
-                <Col>
-                  <ButtonSpinner 
-                    loading={loadingSignUp} 
-                    disabled={loading} 
-                    className='mt-3' 
-                    style={{width:"100%"}} 
-                    color="secondary" 
-                    onClick={signUpNewUser}
+                      className='mt-3' 
+                      style={{width:"100%"}} 
+                      color="secondary" 
+                      onClick={signUpNewUser}
                     >
                       Sign Up
                     </ButtonSpinner>
-                </Col>
-                <Col>
-                  <ButtonSpinner 
-                    loading={loadingSignIn} 
-                    disabled={loading} 
-                    className='mt-3' 
-                    style={{width:"100%", float:"right"}} 
-                    color="primary" 
-                    onClick={signInWithEmail}
+                  </Col>
+                  <Col>
+                    <ButtonSpinner 
+                      type="submit"
+                      loading={loadingSignIn} 
+                      disabled={loading} 
+                      className='mt-3' 
+                      style={{width:"100%", float:"right"}} 
+                      color="primary"
                     >
                       Login
                     </ButtonSpinner>
-                </Col>
-              </Row>
+                  </Col>
+                </Row>
+              </Form>
             </CardBody>
           </Card>
         </Col>
