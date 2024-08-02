@@ -6,6 +6,8 @@ import "../globals.css";
 import { Container, Card, CardTitle, Row, Col, Button, Form, FormGroup, Label, Input, CardBody, Alert} from 'reactstrap';
 import { createClient } from '@/utils/supabase/client'
 import { Lora, Prompt, Inter } from 'next/font/google'
+import ButtonSpinner from '@/components/interface/ButtonSpinner'
+
 
 const prompt = Prompt({
   subsets: ['latin'],
@@ -21,8 +23,16 @@ export default function Login() {
   const [message, setMessage] = useState('')
   const [successMessage, setSuccessMessage] = useState('')
 
+  const [loadingSignIn, setLoadingSignIn] = useState(false)
+  const [loadingSignUp, setLoadingSignUp] = useState(false)
 
   async function signUpNewUser() {
+    setMessage('')
+    setSuccessMessage('')
+    setLoadingSignUp(true)
+
+    await new Promise(r => setTimeout(r, 100))
+
     const { data, error } = await supabase.auth.signUp({
       email: email,
       password: password,
@@ -31,7 +41,10 @@ export default function Login() {
       },
     })
 
+    setLoadingSignUp(false)
+
     if (error) {
+      
       setMessage(error.message)
     }
     else {
@@ -41,13 +54,22 @@ export default function Login() {
   }
   
   async function signInWithEmail() {
+    setMessage('')
+    setSuccessMessage('')
+    setLoadingSignIn(true)
+
+    await new Promise(r => setTimeout(r, 100))
+
     const { data, error } = await supabase.auth.signInWithPassword({
       email: email,
       password: password,
     })
     
+    
+
     if (error) {
       setMessage(error.message)
+      setLoadingSignIn(false)
     }
 
     if (!error && data) {
@@ -57,6 +79,8 @@ export default function Login() {
   }
   
   const onDismiss = () => setMessage('')
+
+  const loading = loadingSignIn || loadingSignUp
 
   return (
     <>
@@ -88,7 +112,15 @@ export default function Login() {
                 <Col>
                   <FormGroup>
                     <Label for="email">Email</Label>
-                    <Input type="email" name="email" id="email" placeholder="Email" value={email} onChange={(e) => setEmail(e.target.value)} />
+                    <Input 
+                      type="email" 
+                      name="email" 
+                      id="email" 
+                      placeholder="Email" 
+                      value={email} 
+                      onChange={(e) => setEmail(e.target.value)} 
+                      disabled={loading} 
+                      />
                   </FormGroup>
                 </Col>
               </Row>
@@ -96,28 +128,50 @@ export default function Login() {
                 <Col>
                   <FormGroup>
                     <Label for="password">Password</Label>
-                    <Input type="password" name="password" id="password" placeholder="Password" value={password} onChange={(e) => setPassword(e.target.value)} />
+                    <Input 
+                      type="password" 
+                      name="password" 
+                      id="password" 
+                      placeholder="Password" 
+                      value={password} 
+                      onChange={(e) => setPassword(e.target.value)} 
+                      disabled={loading}
+                      />
                   </FormGroup>
                 </Col>
               </Row>
               <Row>
                 <Col>
-                  {/* add an x button that clears the message */}
-                  { message && <Alert className="p-2" color="danger">{message}</Alert> }
+                  { (message && !successMessage) && <Alert className="p-2" color="danger">{message}</Alert> }
                   { successMessage && <Alert className="p-2" color="success">{successMessage}</Alert> }
-
-
                 </Col>
               </Row>
               <Row>
                 <Col>
-                  <Button className='mt-3' style={{width:"100%"}} color="secondary" onClick={signUpNewUser}>Sign Up</Button>
+                  <ButtonSpinner 
+                    loading={loadingSignUp} 
+                    disabled={loading} 
+                    className='mt-3' 
+                    style={{width:"100%"}} 
+                    color="secondary" 
+                    onClick={signUpNewUser}
+                    >
+                      Sign Up
+                    </ButtonSpinner>
                 </Col>
                 <Col>
-                  <Button className='mt-3' style={{width:"100%", float:"right"}} color="primary" onClick={signInWithEmail}>Login</Button>
+                  <ButtonSpinner 
+                    loading={loadingSignIn} 
+                    disabled={loading} 
+                    className='mt-3' 
+                    style={{width:"100%", float:"right"}} 
+                    color="primary" 
+                    onClick={signInWithEmail}
+                    >
+                      Login
+                    </ButtonSpinner>
                 </Col>
               </Row>
-              
             </CardBody>
           </Card>
         </Col>
