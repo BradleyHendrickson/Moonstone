@@ -46,6 +46,7 @@ function ProjectCard({ project, canEdit, setEditingProject, setEditModal, refres
 							<IconCurrencyDollar title="Billable Project" />
 						</Col>
 					)}
+					{/* 
 					{isHovered && !canEdit && (
 						<Col xs="auto">
 							<IconClock size={20} style={{ marginLeft: 5, cursor: 'pointer' }} />
@@ -54,6 +55,7 @@ function ProjectCard({ project, canEdit, setEditingProject, setEditModal, refres
 							</strong>
 						</Col>
 					)}
+						*/}
 					{canEdit && (
 						<Col xs="auto">
 							<Button

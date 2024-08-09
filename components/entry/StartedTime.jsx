@@ -38,17 +38,19 @@ export default function StartedTime({ startTime, updateStartTime, muted }) {
 		<>
 			<p	
 				className='mb-0 mt-0 text-muted'
-				style={{ float: "right", cursor: 'pointer', textDecoration: isHovered ? 'underline' : 'none' }}
+				style={{ whiteSpace: "nowrap", float: "right", cursor: 'pointer', textDecoration: isHovered ? 'underline' : 'none' }}
+				// style={{ whiteSpace: "nowrap", marginBottom: "5px" cursor: 'pointer', textDecoration: isHovered ? 'underline' : 'none' }}
 				onMouseEnter={handleMouseEnter}
 				onMouseLeave={handleMouseLeave}
 				onClick={toggleModal}
 			>
-				started {startTime ? formattedStartTime : 'N/A'}
 				{isHovered && (
-					<span style={{ marginLeft: '10px', display: 'inline-flex', alignItems: 'center', textDecoration: 'underline' }}>
+					<span style={{ marginRight: '10px', display: 'inline-flex', alignItems: 'center', textDecoration: 'underline' }}>
 						<IconPencil size={16} style={{ marginRight: '5px' }} />
 					</span>
 				)}
+				started {startTime ? formattedStartTime : 'N/A'}
+
 			</p>
 			<Modal isOpen={modal} toggle={toggleModal}>
 				<ModalHeader toggle={toggleModal}>Edit Start Time</ModalHeader>
