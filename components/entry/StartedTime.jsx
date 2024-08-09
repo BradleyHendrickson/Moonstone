@@ -24,6 +24,7 @@ export default function StartedTime({ startTime, updateStartTime, muted }) {
 	};
 
 	const toggleModal = () => {
+		setNewStartTime(startTime);
 		setModal(!modal);
 	};
 
@@ -31,6 +32,7 @@ export default function StartedTime({ startTime, updateStartTime, muted }) {
 		updateStartTime(newStartTime);
 		toggleModal();
 	};
+
 
 	return (
 		<>

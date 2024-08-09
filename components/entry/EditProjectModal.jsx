@@ -117,6 +117,7 @@ export default function EditProjectModal({ isOpen, toggle, user_id, projectData,
                         <Label for="editProjectName">Name</Label>
                         <Input onChange={handleChange} type="text" name="name" id="editProjectName" value={editedProject.name} placeholder="Project Name" disabled={loading}/>
                     </FormGroup>
+                    {/* 
                     <FormGroup>
                         <Label for="editProjectDescription">Description</Label>
                         <Input onChange={handleChange} type="textarea" name="description" id="editProjectDescription" value={editedProject.description} placeholder="Project Description" disabled={loading}/>
@@ -125,6 +126,7 @@ export default function EditProjectModal({ isOpen, toggle, user_id, projectData,
                         <Label for="editProjectStatus">Status</Label>
                         <Input onChange={handleChange} type="text" name="status" id="editProjectStatus" value={editedProject.status} placeholder="Project Status" disabled={loading}/>
                     </FormGroup>
+                    */}
                     <FormGroup check>
                         <Label check>
                             <Input onChange={handleChange} type="checkbox" name="billable" id="editProjectBillable" checked={editedProject.billable} disabled={loading} />

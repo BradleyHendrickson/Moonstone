@@ -292,7 +292,7 @@ export default function ProjectManager() {
 	return (
 		<Container>
 			<Row>
-				<Col md={6} className="d-none d-md-block">
+				<Col md={6} className="d-none d-lg-block">
 					<Row>
 						<Col>
 							<h2 className="mt-5">{greetingString}</h2>
@@ -304,8 +304,8 @@ export default function ProjectManager() {
 						</Col>
 					</Row>
 				</Col>
-				<Col md={6}>
-					<Card className="mt-3 mt-md-5" style={{ backgroundColor: '#F0F0F0', height: '6rem' }}>
+				<Col lg={6}>
+					<Card className="mt-3 mt-md-5" style={{ backgroundColor: '#F0F0F0'}}>
 						<CardBody>
 							<Row>
 								<Col>
@@ -451,7 +451,7 @@ export default function ProjectManager() {
 					</Row>
 				</Col>
 				<Col xl="4">
-					<h3 className="mb-0">Today's Work</h3>
+					<h3 className="mt-4 mt-xl-0 mb-0">Today's Work</h3>
 					<p className="mt-0 mb-4" style={{ fontSize: '14px', color: 'grey' }}>
 						<strong>Rounded to the nearest 15 min</strong>
 					</p>

@@ -75,6 +75,7 @@ export default function AddProjectModal({isOpen, toggle, user_id, refreshData}) 
                         <Label for="projectName">Name</Label>
                         <Input onChange={handleChange} type="text" name="name" id="projectName" placeholder="Project Name" disabled={loadingAddProject}/>
                     </FormGroup>
+                    {/* 
                     <FormGroup>
                         <Label for="projectDescription">Description</Label>
                         <Input onChange={handleChange} type="textarea" name="description" id="projectDescription" placeholder="Project Description" disabled={loadingAddProject}/>
@@ -83,6 +84,7 @@ export default function AddProjectModal({isOpen, toggle, user_id, refreshData}) 
                         <Label for="projectStatus">Status</Label>
                         <Input onChange={handleChange} type="text" name="status" id="projectStatus" placeholder="Project Status" disabled={loadingAddProject}/>
                     </FormGroup>
+                    */}
                     <FormGroup check>
                         <Label check>
                             <Input onChange={handleChange} type="checkbox" name="billable" id="billable" />{' '}
