@@ -207,8 +207,8 @@ export default function WeeklyWorkSessions() {
 					<div className="mb-2">
 						<Row className="align-items-center">
 							<Col className="d-flex">
-								<h5 className="mb-0 flex-grow-1 project-name">{project.projectName}</h5>
-								<p className="mb-0 ml-auto text-right" style={{ fontSize: '18px' }}>
+								<h6 className="mb-0 flex-grow-1 project-name">{project.projectName}</h6>
+								<p className="mb-0 ml-auto text-right" style={{ fontSize: '16px' }}>
 									<strong className={poppins.className}>{project.totalHours.toFixed(2)} hrs</strong>
 								</p>
 							</Col>
@@ -284,6 +284,7 @@ export default function WeeklyWorkSessions() {
 					</Row>
 				</Col>
 			</Row>
+
 			<Row>
 				{loading ? (
 					<Row>
@@ -302,6 +303,7 @@ export default function WeeklyWorkSessions() {
 						<p>No work sessions found for the selected week.</p>
 					</Col>
 				) : (
+					
 					<>
 						<Col>{viewMode === 'daily' ? renderWorkSessionCards() : renderProjectTotals()}</Col>
 						<Col md={4} className="mt-2 mt-md-0">
