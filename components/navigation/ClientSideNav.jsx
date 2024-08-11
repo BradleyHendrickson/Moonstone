@@ -1,6 +1,6 @@
-'use client'
+'use client';
 import React, { useState } from 'react';
-import { Navbar, NavbarBrand, Nav, NavItem, NavLink, Button, NavbarToggler, Collapse } from 'reactstrap';
+import { Navbar, NavbarBrand, Nav, NavItem, NavLink, Button, NavbarToggler, Collapse, Modal, ModalHeader, ModalBody, ModalFooter } from 'reactstrap';
 import { createClient } from '@/utils/supabase/client';
 import logoSvg from '/public/logo.svg';
 import { usePathname } from 'next/navigation';
@@ -8,6 +8,7 @@ import Image from 'next/image';
 
 export default function ClientSideNav({ signedIn }) {
     const [isOpen, setIsOpen] = useState(false);
+    const [modal, setModal] = useState(false);
     const pathname = usePathname();
 
     function signOut() {
@@ -22,7 +23,8 @@ export default function ClientSideNav({ signedIn }) {
         window.location.href = '/login';
     }
 
-    const toggle = () => setIsOpen(!isOpen);
+    const toggleNavbar = () => setIsOpen(!isOpen);
+    const toggleModal = () => setModal(!modal);
 
     const activeRoute = (routeName) => pathname === routeName;
 
@@ -40,8 +42,13 @@ export default function ClientSideNav({ signedIn }) {
                     Dashboard
                 </NavLink>
             </NavItem>
+            <NavItem >
+                <NavLink style={{ float: "right" }} href="/settings/" active={activeRoute("/settings")}>
+                    Settings
+                </NavLink>
+            </NavItem>
             <NavItem>
-                <Button style={{ marginLeft: "2rem" }} color={signedIn ? "secondary" : "success"} onClick={signedIn ? signOut : () => window.location.href = '/login'}>
+                <Button style={{ marginLeft: "2rem" }} color={signedIn ? "secondary" : "success"} onClick={signedIn ? toggleModal : () => window.location.href = '/login'}>
                     {signedIn ? "Log Out" : "Sign In"}
                 </Button>
             </NavItem>
@@ -50,18 +57,23 @@ export default function ClientSideNav({ signedIn }) {
 
     const renderedMobileNav = (
         <Nav navbar>
-            <NavItem >
-                <NavLink style={{float:"right"}} href="/weeklysummary/" active={activeRoute("/weeklysummary")}>
+            <NavItem>
+                <NavLink style={{ float: "right" }} href="/weeklysummary/" active={activeRoute("/weeklysummary")}>
                     Weekly Summary
                 </NavLink>
             </NavItem>
             <NavItem>
-                <NavLink style={{float:"right"}} href="/dashboard/" active={activeRoute("/dashboard")}>
+                <NavLink style={{ float: "right" }} href="/dashboard/" active={activeRoute("/dashboard")}>
                     Dashboard
                 </NavLink>
             </NavItem>
             <NavItem>
-                <Button  style={{ marginTop: "0.5rem", marginBottom: "0.5rem", float:"right" }} color={signedIn ? "secondary" : "success"} onClick={signedIn ? signOut : () => window.location.href = '/login'}>
+                <NavLink style={{ float: "right" }} href="/settings/" active={activeRoute("/settings")}>
+                    Settings
+                </NavLink>
+            </NavItem>
+            <NavItem>
+                <Button style={{ marginTop: "0.5rem", marginBottom: "0.5rem", float: "right" }} color={signedIn ? "secondary" : "success"} onClick={signedIn ? toggleModal : () => window.location.href = '/login'}>
                     {signedIn ? "Log Out" : "Sign In"}
                 </Button>
             </NavItem>
@@ -79,7 +91,7 @@ export default function ClientSideNav({ signedIn }) {
                 />
                 <span style={{ marginLeft: "0.75rem" }}>Moonstone</span>
             </NavbarBrand>
-            {showNav && <NavbarToggler onClick={toggle} />}
+            {showNav && <NavbarToggler onClick={toggleNavbar} />}
             <Collapse isOpen={isOpen} navbar className="justify-content-end">
                 {showNav && (
                     <>
@@ -92,6 +104,18 @@ export default function ClientSideNav({ signedIn }) {
                     </>
                 )}
             </Collapse>
+
+            {/* Log Out Confirmation Modal */}
+            <Modal isOpen={modal} toggle={toggleModal} centered>
+                <ModalHeader toggle={toggleModal}>Confirm Log Out</ModalHeader>
+                <ModalBody>
+                    Are you sure you want to log out?
+                </ModalBody>
+                <ModalFooter>
+                    <Button color="danger" onClick={signOut}>Log Out</Button>{' '}
+                    <Button color="secondary" onClick={toggleModal}>Cancel</Button>
+                </ModalFooter>
+            </Modal>
         </Navbar>
     );
 }

@@ -14,6 +14,8 @@ import { poppins } from '@/utils/fonts';
 import StartedTime from '@/components/entry/StartedTime';
 //import ButtonSpinner from '../interface/ButtonSpinner';
 import LoadingPlaceholder from '../interface/LoadingPlaceholder';
+import { roundingOptions } from '@/utils/constants';
+
 
 function createGreetingString(currentTime, userName) {
 	if (currentTime < 12) {
@@ -39,18 +41,19 @@ export default function ProjectManager() {
 	const [currentWorkSession, setCurrentWorkSession] = useState(null);
 	const [workSessions, setWorkSessions] = useState([]);
 	const [showAll, setShowAll] = useState(false);
-
+	const [config, setConfig] = useState({});
 	const [initialProjectLoad, setInitialProjectLoad] = useState(true);
 	const [initialWorkSessionLoad, setInitialWorkSessionLoad] = useState(true);
 
 	const [loadingStartTime, setLoadingStartTime] = useState(false);
 
-	const calculateElapsedTime = (startTime, stopTime) => {
+	const calculateElapsedTime = (startTime, stopTime, minSessionLength) => {
 		const start = moment(startTime);
 		const stop = moment(stopTime);
 		const duration = moment.duration(stop.diff(start));
 		const hours = duration.asHours();
-		return Math.round(hours * 4) / 4; // Round to nearest 0.25
+		//return Math.round(hours * 4) / 4; // Round to nearest 0.25
+		return Math.round(hours * (1/minSessionLength)) / (1/minSessionLength); // Round to nearest 0.25
 	};
 
 	function updateStartTime(newStartTime) {
@@ -130,14 +133,43 @@ export default function ProjectManager() {
 
 	async function getUser() {
 		try {
-			const {
-				data: { user }
-			} = await supabase.auth.getUser();
-			setUser(user);
+		  const {
+			data: { user }
+		  } = await supabase.auth.getUser();
+		  setUser(user);
+	  
+		  if (user) {
+			// Fetch the related record from the usersettings table
+			const { data, error } = await supabase
+			  .from('usersettings')
+			  .select('config')
+			  .eq('user_id', user.id)
+			  .single();
+	  
+			if (error && error.code === 'PGRST116') {
+			  // No row exists, create a new one
+			  const { data: newData, error: newError } = await supabase
+				.from('usersettings')
+				.insert({ user_id: user.id, config: {} })
+				.select()
+				.single();
+	  
+			  if (newError) {
+				throw newError;
+			  }
+	  
+			  setConfig(newData.config);
+			} else if (error) {
+			  throw error;
+			} else {
+			  setConfig(data.config);
+			}
+		  }
 		} catch (error) {
-			console.log(error);
+		  console.log(error);
 		}
-	}
+	  }
+	  
 
 	async function getWorkSessions() {
 		try {
@@ -235,6 +267,8 @@ export default function ProjectManager() {
 	const userName = 'Brad';
 	const greetingString = createGreetingString(currentTime, userName);
 
+	const minSessionLength = config?.minSessionLength ?? 0.25;
+
 	const totalHours =
 		workSessions.reduce((acc, workSession) => {
 			const start = workSession.start_time ? new Date(workSession.start_time).getTime() : null;
@@ -242,7 +276,8 @@ export default function ProjectManager() {
 
 			if (start !== null && stop !== null) {
 				const duration = (stop - start) / 1000 / 60 / 60; // Duration in hours
-				const roundedDuration = Math.round(duration * 4) / 4; // Round to nearest 0.25
+				//const roundedDuration = Math.round(duration * 4) / 4; // Round to nearest 0.25
+				const roundedDuration = Math.round(duration * (1/minSessionLength)) / (1/minSessionLength); // Round to nearest minSessionLength
 				return acc + roundedDuration;
 			} else {
 				return acc; // Return current accumulator if either start_time or stop_time is null
@@ -258,7 +293,7 @@ export default function ProjectManager() {
 
 				if (start !== null && stop !== null) {
 					const duration = (stop - start) / 1000 / 60 / 60; // Duration in hours
-					const roundedDuration = Math.round(duration * 4) / 4; // Round to nearest 0.25
+					const roundedDuration = Math.round(duration * (1/minSessionLength)) / (1/minSessionLength); // Round to nearest minSessionLength
 					return acc + roundedDuration;
 				}
 			}
@@ -453,7 +488,9 @@ export default function ProjectManager() {
 				<Col xl="4">
 					<h3 className="mt-4 mt-xl-0 mb-0">Today's Work</h3>
 					<p className="mt-0 mb-4" style={{ fontSize: '14px', color: 'grey' }}>
-						<strong>Rounded to the nearest 15 min</strong>
+						<strong>Rounded to the nearest {
+							roundingOptions.find((option) => option.value == minSessionLength)?.label
+							}</strong>
 					</p>
 					{loadingWorkSessions && initialWorkSessionLoad && (!workSessions || workSessions.length == 0) ? (
 						<>
@@ -465,7 +502,7 @@ export default function ProjectManager() {
 					) : (
 						workSessions
 							?.sort((a, b) => new Date(a.start_time).getTime() - new Date(b.start_time).getTime())
-							.filter((s) => s.stop_time && calculateElapsedTime(s.start_time, s.stop_time) > 0)
+							.filter((s) => s.stop_time && calculateElapsedTime(s.start_time, s.stop_time, minSessionLength) > 0)
 							.map((workSession) => {
 								return (
 									<>
@@ -473,6 +510,7 @@ export default function ProjectManager() {
 											updateWorkSession={updateWorkSession}
 											workSession={workSession}
 											projectName={projects.find((project) => project.id === workSession.project_id)?.name}
+											minSessionLength={minSessionLength}
 										/>
 									</>
 								);

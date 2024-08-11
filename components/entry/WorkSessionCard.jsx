@@ -7,7 +7,7 @@ import { poppins } from '@/utils/fonts';
 
   
 
-const WorkSessionCard = ({ workSession, projectName, updateWorkSession }) => {
+const WorkSessionCard = ({ workSession, projectName, updateWorkSession, minSessionLength }) => {
     const formatTime = (time) => {
         return moment(time).format('hh:mm A');
     }
@@ -17,7 +17,7 @@ const WorkSessionCard = ({ workSession, projectName, updateWorkSession }) => {
         const stop = moment(stopTime);
         const duration = moment.duration(stop.diff(start));
         const hours = duration.asHours();
-        return Math.round(hours * 4) / 4; // Round to nearest 0.25
+        return Math.round(hours * (1/minSessionLength)) / (1/minSessionLength); // Round to nearest 0.25
     }
 
     const formattedStartTime = formatTime(workSession.start_time);

@@ -15,8 +15,50 @@ export default function WeeklyWorkSessions() {
 	const [loading, setLoading] = useState(false);
 	const [expandedDays, setExpandedDays] = useState({}); // State to track which days are expanded
 	const [viewMode, setViewMode] = useState('daily'); // State to track view mode
+	const [config, setConfig] = useState({});
+	const [user, setUser] = useState(null);
+
+	async function getUser() {
+		try {
+		  const {
+			data: { user }
+		  } = await supabase.auth.getUser();
+		  setUser(user);
+	  
+		  if (user) {
+			// Fetch the related record from the usersettings table
+			const { data, error } = await supabase
+			  .from('usersettings')
+			  .select('config')
+			  .eq('user_id', user.id)
+			  .single();
+	  
+			if (error && error.code === 'PGRST116') {
+			  // No row exists, create a new one
+			  const { data: newData, error: newError } = await supabase
+				.from('usersettings')
+				.insert({ user_id: user.id, config: {} })
+				.select()
+				.single();
+	  
+			  if (newError) {
+				throw newError;
+			  }
+	  
+			  setConfig(newData.config);
+			} else if (error) {
+			  throw error;
+			} else {
+			  setConfig(data.config);
+			}
+		  }
+		} catch (error) {
+		  console.log(error);
+		}
+	  }
 
 	useEffect(() => {
+		getUser()
 		fetchProjects();
 	}, []);
 
@@ -56,12 +98,12 @@ export default function WeeklyWorkSessions() {
 		}
 	}
 
-	const calculateElapsedTime = (startTime, stopTime) => {
+	const calculateElapsedTime = (startTime, stopTime, minSessionLength) => {
 		const start = moment(startTime);
 		const stop = moment(stopTime);
 		const duration = moment.duration(stop.diff(start));
 		const hours = duration.asHours();
-		return Math.round(hours * 4) / 4; // Round to nearest 0.25
+		return Math.round(hours * (1/minSessionLength)) / (1/minSessionLength); // Round to nearest 0.25
 	};
 
 	async function fetchWorkSessions(weekStart) {
@@ -80,8 +122,8 @@ export default function WeeklyWorkSessions() {
 			if (error) throw error;
 
 			const filteredSessions = data.filter((session) => {
-				const elapsedTime = calculateElapsedTime(session.start_time, session.stop_time);
-				return elapsedTime >= 0.25;
+				const elapsedTime = calculateElapsedTime(session.start_time, session.stop_time, minSessionLength);
+				return elapsedTime >= minSessionLength;
 			});
 
 			const enrichedSessions = filteredSessions.map((session) => {
@@ -107,6 +149,8 @@ export default function WeeklyWorkSessions() {
 		}));
 	};
 
+	const minSessionLength = config?.minSessionLength ?? 0.25;
+
 	const renderWorkSessionCards = () => {
 		const daysOfWeek = [];
 		let currentDate = selectedWeek.clone().startOf('week');
@@ -119,7 +163,7 @@ export default function WeeklyWorkSessions() {
 		return daysOfWeek.map((day) => {
 			const daySessions = workSessions.filter((session) => moment(session.start_time).isSame(day, 'day'));
 			const totalHours = daySessions.reduce((total, session) => {
-				const elapsedTime = calculateElapsedTime(session.start_time, session.stop_time);
+				const elapsedTime = calculateElapsedTime(session.start_time, session.stop_time, minSessionLength);
 				return total + elapsedTime;
 			}, 0);
 
@@ -151,7 +195,7 @@ export default function WeeklyWorkSessions() {
 					{!isZeroHours && (
 						<Collapse isOpen={expandedDays[day.format('YYYY-MM-DD')]}>
 							{daySessions.map((session) => (
-								<WorkSessionCard key={session.id} workSession={session} updateWorkSession={updateWorkSession} projectName={session.projectName} />
+								<WorkSessionCard key={session.id} workSession={session} updateWorkSession={updateWorkSession} projectName={session.projectName} minSessionLength={minSessionLength} />
 							))}
 						</Collapse>
 					)}
@@ -162,7 +206,7 @@ export default function WeeklyWorkSessions() {
 
 	const renderProjectTotals = () => {
 		const projectTotals = workSessions.reduce((acc, session) => {
-			const elapsedTime = calculateElapsedTime(session.start_time, session.stop_time);
+			const elapsedTime = calculateElapsedTime(session.start_time, session.stop_time, minSessionLength);
 			if (!acc[session.project_id]) {
 				acc[session.project_id] = { projectName: session.projectName, totalHours: 0 };
 			}
@@ -223,14 +267,14 @@ export default function WeeklyWorkSessions() {
 	
 	const calculateWeeklyTotals = () => {
 		const totalHours = workSessions.reduce((total, session) => {
-			const elapsedTime = calculateElapsedTime(session.start_time, session.stop_time);
+			const elapsedTime = calculateElapsedTime(session.start_time, session.stop_time, minSessionLength);
 			return total + elapsedTime;
 		}, 0);
 
 		const billableHours = workSessions.reduce((total, session) => {
-			const elapsedTime = calculateElapsedTime(session.start_time, session.stop_time);
+			const elapsedTime = calculateElapsedTime(session.start_time, session.stop_time, minSessionLength);
 			const project = projects.find((p) => p.id === session.project_id);
-			if (elapsedTime >= 0.25 && project?.billable) {
+			if (elapsedTime >= minSessionLength && project?.billable) {
 				return total + elapsedTime;
 			}
 			return total;
@@ -245,6 +289,7 @@ export default function WeeklyWorkSessions() {
 	const selectedWeekString = selectedWeek.format('MMMM Do, YYYY');
 	const weekStartString = selectedWeek.clone().startOf('week').format('MMMM Do, YYYY');
 	const weekEndString = selectedWeek.clone().endOf('week').format('MMMM Do, YYYY');
+	
 
 	return (
 		<Container className="mt-3">
