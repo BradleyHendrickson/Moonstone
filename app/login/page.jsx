@@ -120,7 +120,7 @@ export default function Login() {
                         type="email" 
                         name="email" 
                         id="email" 
-                        placeholder="Email" 
+                        //placeholder="Email" 
                         value={email} 
                         onChange={(e) => setEmail(e.target.value)} 
                         disabled={loading} 
@@ -136,7 +136,7 @@ export default function Login() {
                         type="password" 
                         name="password" 
                         id="password" 
-                        placeholder="Password" 
+                        //placeholder="Password" 
                         value={password} 
                         onChange={(e) => setPassword(e.target.value)} 
                         disabled={loading}
