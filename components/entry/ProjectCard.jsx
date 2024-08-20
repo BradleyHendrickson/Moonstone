@@ -2,13 +2,16 @@ import React, { useState } from 'react';
 import { Card, CardBody, CardTitle, Button, Row, Col, Modal, ModalHeader, ModalBody, ModalFooter } from 'reactstrap';
 import { IconGripVertical, IconCurrencyDollar } from '@tabler/icons-react';
 
-function ProjectCard({ project, canEdit, setEditingProject, setEditModal, refreshData, startWork, currentWorkSession, archiveProject }) {
+function ProjectCard({ project, canEdit, setEditingProject, setEditModal, refreshData, startWork, currentWorkSession, archiveProject, onClick }) {
 	const [isHovered, setIsHovered] = useState(false);
 	const [isModalOpen, setIsModalOpen] = useState(false);
 
 	const toggleModal = () => setIsModalOpen(!isModalOpen);
 
-	const handleCardClick = () => {
+	const handleCardClick = (event) => {
+		
+		onClick(event)
+
 		if (currentWorkSession?.project_id === project.id) {
 			return;
 		}
@@ -64,7 +67,7 @@ function ProjectCard({ project, canEdit, setEditingProject, setEditModal, refres
 									color="secondary"
 									outline
 									style={{ float: 'right', marginRight: '5px', width: "50px" }}
-									onClick={() => {
+									onClick={(event) => {
 										setEditingProject(project);
 										setEditModal(true);
 									}}

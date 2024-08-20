@@ -61,7 +61,7 @@ export default function AddProjectModal({isOpen, toggle, user_id, refreshData}) 
             alert("Error adding project");
             console.log(error);
         } finally {
-            refreshData()
+            refreshData(newProject)
             toggle();
         }
     }

@@ -2,10 +2,13 @@ import { React, useEffect, useState } from 'react';
 import { Modal, ModalHeader, ModalBody, ModalFooter, Button, FormGroup, Label, Input, Row, Col } from 'reactstrap';
 import moment from 'moment';
 import ButtonSpinner from '@/components/interface/ButtonSpinner';
+import Select from 'react-select';
+import SelectProject from '@/components/interface/SelectProject';
 
-export default function EditWorkSessionModal({ workSession, projectName, isOpen, toggle, updateWorkSession }) {
+export default function EditWorkSessionModal({ workSession, projectName, project, isOpen, toggle, updateWorkSession, supabaseClient }) {
     const [startTime, setStartTime] = useState('');
     const [stopTime, setStopTime] = useState('');
+    const [selectedProject, setSelectedProject] = useState(null);
     const [description, setDescription] = useState(workSession.description);
     const [loadingUpdate, setLoadingUpdate] = useState(false);
 
@@ -16,6 +19,7 @@ export default function EditWorkSessionModal({ workSession, projectName, isOpen,
 
         setStartTime(initialStartTime);
         setStopTime(initialStopTime);
+
     }, [isOpen, workSession.start_time, workSession.stop_time]);
 
     const handleUpdate = async () => {
@@ -36,7 +40,8 @@ export default function EditWorkSessionModal({ workSession, projectName, isOpen,
             id: workSession.id,
             start_time: adjustedStartTime,
             stop_time: adjustedStopTime,
-            description: description
+            description: description,
+            project_id: selectedProject.id
         });
 
         setLoadingUpdate(false);
@@ -51,16 +56,24 @@ export default function EditWorkSessionModal({ workSession, projectName, isOpen,
         setStopTime(e.target.value);
     }
 
+
     return (
         <Modal isOpen={isOpen} toggle={toggle}>
             <ModalHeader toggle={toggle}><strong>Edit Work Session</strong></ModalHeader>
             <ModalBody>
+                <pre>{JSON.stringify(project)}</pre>
                 <Row>
                     <Col>
-                        <FormGroup>
-                            <Label for="project">Project</Label>
-                            <Input type="text" name="project" id="project" value={projectName} disabled />
-                        </FormGroup>
+                    <SelectProject 
+                        supabase={supabaseClient}
+                        useDefaultValue={
+                            project ? 
+                            {
+                                value: project,
+                                label: project?.name
+                            } : null
+                        }
+                    />
                     </Col>
                 </Row>
                 <Row>
