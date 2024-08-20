@@ -2,10 +2,10 @@ import React, { useEffect, useState } from 'react';
 import { FormGroup, Label } from 'reactstrap';
 import Select from 'react-select';
 
-const SelectProject = ({ supabase, defaultValue }) => {
+const SelectProject = ({ supabase, value, onChange }) => {
     const [projects, setProjects] = useState([]);
     const [loadingProjects, setLoadingProjects] = useState(false);
-    const [selectedProject, setSelectedProject] = useState(defaultValue || null);
+    const [selectedProject, setSelectedProject] = useState(null);
     const [initialProjectLoad, setInitialProjectLoad] = useState(true);
 
     useEffect(() => {
@@ -13,10 +13,10 @@ const SelectProject = ({ supabase, defaultValue }) => {
     }, []);
 
     useEffect(() => {
-        if (defaultValue) {
-            setSelectedProject(defaultValue);
+        if (initialProjectLoad && projects.length > 0) {
+            setSelectedProject(projects[0]);
         }
-    }, [defaultValue]);
+    }, [initialProjectLoad, projects]);
 
     async function getProjects() {
         try {
@@ -45,22 +45,21 @@ const SelectProject = ({ supabase, defaultValue }) => {
         value: project,
         label: project.name
     }));
+    
 
     return (
         <FormGroup>
             <Label for="project">Project</Label>
             <Select
                 options={projectSelections}
-                onChange={selectedOption => setSelectedProject(selectedOption ? selectedOption.value : null)}
-                value={{
-                    value: selectedProject,
-                    label: selectedProject ? selectedProject.name : '...'
-                }}
+                onChange={onChange}
+                value={value}
                 isClearable
                 isLoading={loadingProjects}
             />
         </FormGroup>
     );
+
 };
 
 export default SelectProject;

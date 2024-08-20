@@ -9,8 +9,13 @@ export default function EditWorkSessionModal({ workSession, projectName, project
     const [startTime, setStartTime] = useState('');
     const [stopTime, setStopTime] = useState('');
     const [selectedProject, setSelectedProject] = useState(null);
+    const [selectedProjectVL, setSelectedProjectVL] = useState(null);
     const [description, setDescription] = useState(workSession.description);
     const [loadingUpdate, setLoadingUpdate] = useState(false);
+    const [loadingDelete, setLoadingDelete] = useState(false);
+
+    const handleDelete = async () => {
+    }
 
     useEffect(() => {
         // Extract the time portion from the start and stop times
@@ -19,6 +24,11 @@ export default function EditWorkSessionModal({ workSession, projectName, project
 
         setStartTime(initialStartTime);
         setStopTime(initialStopTime);
+
+        setSelectedProjectVL({
+            value: project,
+            label: projectName
+        });
 
     }, [isOpen, workSession.start_time, workSession.stop_time]);
 
@@ -41,7 +51,7 @@ export default function EditWorkSessionModal({ workSession, projectName, project
             start_time: adjustedStartTime,
             stop_time: adjustedStopTime,
             description: description,
-            project_id: selectedProject.id
+            project_id: selectedProjectVL.value.id
         });
 
         setLoadingUpdate(false);
@@ -56,23 +66,27 @@ export default function EditWorkSessionModal({ workSession, projectName, project
         setStopTime(e.target.value);
     }
 
+    const onChangeProject = (selectedOption) => {
+        if (selectedOption) {
+            setSelectedProjectVL({
+                value: selectedOption.value,
+                label: selectedOption.label
+            });
+        } else {
+            setSelectedProjectVL(null);
+        }
+    }
 
     return (
         <Modal isOpen={isOpen} toggle={toggle}>
             <ModalHeader toggle={toggle}><strong>Edit Work Session</strong></ModalHeader>
             <ModalBody>
-                <pre>{JSON.stringify(project)}</pre>
                 <Row>
                     <Col>
                     <SelectProject 
                         supabase={supabaseClient}
-                        useDefaultValue={
-                            project ? 
-                            {
-                                value: project,
-                                label: project?.name
-                            } : null
-                        }
+                        value={selectedProjectVL}
+                        onChange={onChangeProject}
                     />
                     </Col>
                 </Row>
@@ -92,16 +106,17 @@ export default function EditWorkSessionModal({ workSession, projectName, project
                 </Row>
             </ModalBody>
             <ModalFooter>
+                <Button style={{ width: "100px" }} disabled={loadingUpdate || loadingDelete} color="secondary" onClick={toggle}>Cancel</Button>
                 <ButtonSpinner
                     loading={loadingUpdate}
                     disabled={loadingUpdate}
                     color="primary"
                     onClick={handleUpdate}
-                    style={{ width: "150px" }}
+                    style={{ width: "100px" }}
                 >
-                    Update
+                    Save
                 </ButtonSpinner>
-                <Button style={{ width: "150px" }} disabled={loadingUpdate} color="secondary" onClick={toggle}>Cancel</Button>
+               
             </ModalFooter>
         </Modal>
     );

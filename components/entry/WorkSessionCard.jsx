@@ -27,7 +27,8 @@ const WorkSessionCard = ({ workSession, projectName, project, updateWorkSession,
     const [isOpen, setIsOpen] = useState(false);
     const [isHovered, setIsHovered] = useState(false);
 
-    const toggle = () => {
+    const toggle = (where) => {
+        console.log('Toggle function called from', where);
         setIsOpen(!isOpen)
         setIsHovered(false);
     };
@@ -42,11 +43,11 @@ const WorkSessionCard = ({ workSession, projectName, project, updateWorkSession,
 
     return (
         <div key={workSession.id} style={{marginTop: "0.5rem"}} className={poppins.className}>
-            <CardBody onClick={toggle}
+            <CardBody
                 onMouseEnter={handleMouseEnter}
                 onMouseLeave={handleMouseLeave}
                 style={isHovered ? { backgroundColor: '#F0F0F0', textDecoration: 'underline' } : {}}>
-                <Row>
+                <Row  onClick={toggle}>
                     <Col className="text-truncate">
                         <CardTitle tag="h6" className="text-truncate">{projectName}</CardTitle>
                     </Col>
