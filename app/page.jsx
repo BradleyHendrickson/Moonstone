@@ -34,8 +34,9 @@ export default async function Index() {
             
 					)}
           <ul>
-            <li><Link href="/dashboard">Dashboard</Link>: manage projects and record what you work on</li>
+            <li><Link href="/tracker">Time Tracker</Link>: record what you work on</li>
             <li><Link href="/weeklysummary">Weekly Summary</Link>: see what you worked on each week by project or day</li>
+			<li><Link href="/projects">Projects</Link>: manage your projects</li>
           </ul>
 				</Col>
 				<Col

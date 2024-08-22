@@ -33,13 +33,19 @@ export default function ClientSideNav({ signedIn }) {
     const renderedNav = (
         <Nav className="ml-auto" navbar>
             <NavItem className="d-none d-md-block">
-                <NavLink href="/weeklysummary/" active={activeRoute("/weeklysummary")}>
-                    Weekly Summary
+                <NavLink href="/projects/" active={activeRoute("/projects")}>
+                    Projects
+                </NavLink>
+            </NavItem>
+
+            <NavItem className="d-none d-md-block">
+                <NavLink href="/tracker/" active={activeRoute("/tracker")}>
+                    Time Tracker
                 </NavLink>
             </NavItem>
             <NavItem className="d-none d-md-block">
-                <NavLink href="/dashboard/" active={activeRoute("/dashboard")}>
-                    Dashboard
+                <NavLink href="/weeklysummary/" active={activeRoute("/weeklysummary")}>
+                    Weekly Summary
                 </NavLink>
             </NavItem>
             <NavItem >
