@@ -64,13 +64,18 @@ export default function ClientSideNav({ signedIn }) {
     const renderedMobileNav = (
         <Nav navbar>
             <NavItem>
-                <NavLink style={{ float: "right" }} href="/weeklysummary/" active={activeRoute("/weeklysummary")}>
-                    Weekly Summary
+                <NavLink style={{ float: "right" }} href="/projects/" active={activeRoute("/projects")}>
+                    Projects
                 </NavLink>
             </NavItem>
             <NavItem>
-                <NavLink style={{ float: "right" }} href="/dashboard/" active={activeRoute("/dashboard")}>
-                    Dashboard
+                <NavLink style={{ float: "right" }} href="/tracker/" active={activeRoute("/tracker")}>
+                    Time Tracker
+                </NavLink>
+            </NavItem>
+            <NavItem>
+                <NavLink style={{ float: "right" }} href="/weeklysummary/" active={activeRoute("/weeklysummary")}>
+                    Weekly Summary
                 </NavLink>
             </NavItem>
             <NavItem>

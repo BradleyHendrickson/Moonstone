@@ -18,6 +18,29 @@ export default function WeeklyWorkSessions() {
 	const [config, setConfig] = useState({});
 	const [user, setUser] = useState(null);
 
+    async function deleteWorkSession(workSessionId) {
+        try {
+            const { data, error } = await supabase
+                .from('worksession')
+                .delete()
+                .eq('id', workSessionId)
+                .select();
+            
+            if (error) {
+                throw error;
+            }
+    
+            if (data && data.length > 0) {
+                refreshData('user useeffect');
+                //setCurrentWorkSession(null);
+            }
+        } catch (error) {
+            console.log(error);
+        } finally {
+            // You can add any final cleanup or state reset here if needed
+        }
+    }    
+
 	async function getUser() {
 		try {
 		  const {
@@ -75,16 +98,19 @@ export default function WeeklyWorkSessions() {
 				.update([{ ...workSession }])
 				.eq('id', workSession.id)
 				.select();
-
+	
 			if (error) {
 				throw error;
 			}
-
+	
 			if (data && data.length > 0) {
-				fetchWorkSessions(selectedWeek);
+				fetchProjects()
+				//setCurrentWorkSession(null);
 			}
 		} catch (error) {
 			console.log(error);
+		} finally {
+
 		}
 	}
 
@@ -195,7 +221,9 @@ export default function WeeklyWorkSessions() {
 					{!isZeroHours && (
 						<Collapse isOpen={expandedDays[day.format('YYYY-MM-DD')]}>
 							{daySessions.map((session) => (
-								<WorkSessionCard key={session.id} workSession={session} updateWorkSession={updateWorkSession} projectName={session.projectName} minSessionLength={minSessionLength} />
+								<WorkSessionCard key={session.id} workSession={session} deleteWorkSession={deleteWorkSession} updateWorkSession={updateWorkSession} projectName={session.projectName} 
+								project = {projects.find((p) => p.id === session.project_id)}
+								minSessionLength={minSessionLength} />
 							))}
 						</Collapse>
 					)}

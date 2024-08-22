@@ -7,7 +7,7 @@ import { poppins } from '@/utils/fonts';
 
   
 
-const WorkSessionCard = ({ workSession, projectName, project, updateWorkSession, minSessionLength, supabaseClient }) => {
+const WorkSessionCard = ({ workSession, projectName, project, updateWorkSession, minSessionLength, supabaseClient, deleteWorkSession}) => {
     const formatTime = (time) => {
         return moment(time).format('hh:mm A');
     }
@@ -64,7 +64,7 @@ const WorkSessionCard = ({ workSession, projectName, project, updateWorkSession,
                         </CardText>
                     </Col>
                 </Row>
-                <EditWorkSessionModal project ={project}  projectName={projectName} updateWorkSession={updateWorkSession} workSession={workSession} isOpen={isOpen} toggle={toggle} supabaseClient={supabaseClient}/>
+                <EditWorkSessionModal deleteWorkSession={deleteWorkSession} project ={project}  projectName={projectName} updateWorkSession={updateWorkSession} workSession={workSession} isOpen={isOpen} toggle={toggle} supabaseClient={supabaseClient}/>
             </CardBody>
         </div>
     );

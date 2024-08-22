@@ -59,6 +59,29 @@ export default function ProjectManager() {
 		updateWorkSession(updatedWorkSession);
 	}
 
+    async function deleteWorkSession(workSessionId) {
+        try {
+            const { data, error } = await supabase
+                .from('worksession')
+                .delete()
+                .eq('id', workSessionId)
+                .select();
+            
+            if (error) {
+                throw error;
+            }
+    
+            if (data && data.length > 0) {
+                refreshData('user useeffect');
+                setCurrentWorkSession(null);
+            }
+        } catch (error) {
+            console.log(error);
+        } finally {
+            // You can add any final cleanup or state reset here if needed
+        }
+    }    
+
 	async function updateWorkSession(workSession) {
 		try {
 			const { data, error } = await supabase
@@ -505,16 +528,16 @@ export default function ProjectManager() {
 							.filter((s) => s.stop_time && calculateElapsedTime(s.start_time, s.stop_time, minSessionLength) > 0)
 							.map((workSession) => {
 								return (
-									<>
 										<WorkSessionCard
+											key={workSession.id}
 											updateWorkSession={updateWorkSession}
+											deleteWorkSession={deleteWorkSession}
 											workSession={workSession}
 											projectName={projects.find((project) => project.id === workSession.project_id)?.name}
 											project = {projects.find((project) => project.id === workSession.project_id)}
 											minSessionLength={minSessionLength}
 											supabaseClient={supabase}
 										/>
-									</>
 								);
 							})
 					)}

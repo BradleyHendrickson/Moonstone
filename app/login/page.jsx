@@ -73,7 +73,7 @@ export default function Login() {
 
     if (!error && data) {
       // redirect to /
-      window.location.href = '/dashboard'
+      window.location.href = '/tracker'
     }
   }
   
