@@ -2,20 +2,21 @@ import React, { useState } from 'react';
 import { Card, CardBody, CardTitle, Button, Row, Col, Modal, ModalHeader, ModalBody, ModalFooter } from 'reactstrap';
 import { IconGripVertical, IconCurrencyDollar } from '@tabler/icons-react';
 
-function ProjectCard({ project, canEdit, setEditingProject, setEditModal, refreshData, startWork, currentWorkSession, archiveProject, onClick, disableClick }) {
+function ProjectCard({ project, canEdit, setEditingProject, setEditModal, refreshData, startWork, currentWorkSession, archiveProject, onClick, disableClick, isArchived, toggleArchive }) {
 	const [isHovered, setIsHovered] = useState(false);
-	const [isModalOpen, setIsModalOpen] = useState(false);
+	const [isWorkSessionModalOpen, setIsWorkSessionModalOpen] = useState(false);
+	const [isRestoreModalOpen, setIsRestoreModalOpen] = useState(false);
 
-	const toggleModal = () => setIsModalOpen(!isModalOpen);
+	const toggleWorkSessionModal = () => setIsWorkSessionModalOpen(!isWorkSessionModalOpen);
+	const toggleRestoreModal = () => setIsRestoreModalOpen(!isRestoreModalOpen);
 
 	const handleCardClick = (event) => {
 		if (disableClick) {	
 			return;
 		}
 
-		
 		if (onClick) {
-			onClick(event)
+			onClick(event);
 		}
 
 		if (currentWorkSession?.project_id === project.id) {
@@ -23,7 +24,7 @@ function ProjectCard({ project, canEdit, setEditingProject, setEditModal, refres
 		}
 
 		if (currentWorkSession) {
-			toggleModal();
+			toggleWorkSessionModal();
 		} else {
 			if (!canEdit) {
 				startWork(project);
@@ -33,9 +34,14 @@ function ProjectCard({ project, canEdit, setEditingProject, setEditModal, refres
 	};
 
 	const confirmSwitch = () => {
-		toggleModal();
+		toggleWorkSessionModal();
 		startWork(project);
 		setIsHovered(false);
+	};
+
+	const confirmRestore = () => {
+		toggleRestoreModal();
+		toggleArchive();
 	};
 
 	return (
@@ -53,11 +59,6 @@ function ProjectCard({ project, canEdit, setEditingProject, setEditModal, refres
 			>
 				<CardBody className="p-2">
 					<Row>
-						{canEdit && (
-							<Col xs="auto" className="d-flex align-items-center">
-								<IconGripVertical />
-							</Col>
-						)}
 						<Col>
 							<CardTitle tag="h6">{project.name}</CardTitle>
 						</Col>
@@ -66,7 +67,7 @@ function ProjectCard({ project, canEdit, setEditingProject, setEditModal, refres
 								<IconCurrencyDollar title="Billable Project" />
 							</Col>
 						)}
-						{canEdit && (
+						{canEdit && !isArchived && (
 							<Col xs="auto">
 								<Button
 									size="sm"
@@ -74,6 +75,7 @@ function ProjectCard({ project, canEdit, setEditingProject, setEditModal, refres
 									outline
 									style={{ float: 'right', marginRight: '5px', width: "50px" }}
 									onClick={(event) => {
+										event.stopPropagation();
 										setEditingProject(project);
 										setEditModal(true);
 									}}
@@ -82,18 +84,46 @@ function ProjectCard({ project, canEdit, setEditingProject, setEditModal, refres
 								</Button>
 							</Col>
 						)}
+						{isArchived && (
+							<Col xs="auto">
+								<Button
+									size="sm"
+									color="secondary"
+									style={{ float: 'right', marginRight: '5px', width: "100px" }}
+									onClick={(event) => {
+										event.stopPropagation();
+										toggleRestoreModal(); // Open the restore confirmation dialog
+									}}
+								>
+									Restore
+								</Button>
+							</Col>
+						)}
 					</Row>
 				</CardBody>
 			</Card>
 
-			<Modal isOpen={isModalOpen} toggle={toggleModal}>
-				<ModalHeader toggle={toggleModal}>Confirm Switch</ModalHeader>
+			{/* Modal for confirming work session switch */}
+			<Modal isOpen={isWorkSessionModalOpen} toggle={toggleWorkSessionModal}>
+				<ModalHeader toggle={toggleWorkSessionModal}>Confirm Switch</ModalHeader>
 				<ModalBody>
 					You are currently working on another project. Are you sure you want to switch to "{project.name}"?
 				</ModalBody>
 				<ModalFooter>
-					<Button color="secondary" onClick={toggleModal}>Cancel</Button>
-					<Button color="primary" onClick={confirmSwitch}>Yes, Switch</Button>{' '}
+					<Button color="secondary" onClick={toggleWorkSessionModal}>Cancel</Button>
+					<Button color="primary" onClick={confirmSwitch}>Yes, Switch</Button>
+				</ModalFooter>
+			</Modal>
+
+			{/* Modal for confirming restore action */}
+			<Modal isOpen={isRestoreModalOpen} toggle={toggleRestoreModal}>
+				<ModalHeader toggle={toggleRestoreModal}>Confirm Restore</ModalHeader>
+				<ModalBody>
+					Are you sure you want to restore the project "{project.name}"?
+				</ModalBody>
+				<ModalFooter>
+					<Button color="secondary" onClick={toggleRestoreModal}>Cancel</Button>
+					<Button color="primary" onClick={confirmRestore}>Yes, Restore</Button>
 				</ModalFooter>
 			</Modal>
 		</>

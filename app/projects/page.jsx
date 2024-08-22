@@ -1,19 +1,12 @@
 'use client'
-import { Container, Row, Col, Card, CardText, CardBody, CardTitle, CardSubtitle, Button, Spinner } from 'reactstrap';
-import LiveTimeCounter from '@/components/entry/LiveTimeCounter';
-import { React, use, useEffect, useState } from 'react';
+import { Container, Row, Col, Button } from 'reactstrap';
+import React, { use, useEffect, useState } from 'react';
 import { createClient } from '@/utils/supabase/client';
 import AddProjectModal from '@/components/entry/AddProjectModal';
 import EditProjectModal from '@/components/entry/EditProjectModal';
-import { IconPlus, IconPencil, IconCheck, IconCaretDown, IconCaretUp } from '@tabler/icons-react';
+import { IconPlus, IconPencil, IconCheck, IconCaretDown, IconCaretUp, IconArchive, IconArrowLeft } from '@tabler/icons-react';
 import ProjectCard from '@/components/entry/ProjectCard';
-import WorkSessionCard from '@/components/entry/WorkSessionCard';
-import moment from 'moment';
-import { poppins } from '@/utils/fonts';
-import StartedTime from '@/components/entry/StartedTime';
-//import ButtonSpinner from '../interface/ButtonSpinner';
 import LoadingPlaceholder from '@/components/interface/LoadingPlaceholder';
-import { roundingOptions } from '@/utils/constants';
 
 export default function ProjectsPage() {
 	const supabase = createClient();
@@ -21,199 +14,34 @@ export default function ProjectsPage() {
 	const [user, setUser] = useState(null);
 	const [projects, setProjects] = useState([]);
 	const [loadingProjects, setLoadingProjects] = useState(true);
-	const [loadingWorkSessions, setLoadingWorkSessions] = useState(true);
 	const [canEdit, setCanEdit] = useState(false);
 	const [editingProject, setEditingProject] = useState(null);
 	const [createModal, setCreateModal] = useState(false);
 	const [editModal, setEditModal] = useState(false);
-	const [currentWorkSession, setCurrentWorkSession] = useState(null);
-	const [workSessions, setWorkSessions] = useState([]);
 	const [showAll, setShowAll] = useState(false);
-	const [config, setConfig] = useState({});
+	const [showArchived, setShowArchived] = useState(false); // New state for archived projects view
 	const [initialProjectLoad, setInitialProjectLoad] = useState(true);
-	const [initialWorkSessionLoad, setInitialWorkSessionLoad] = useState(true);
-
-	const [loadingStartTime, setLoadingStartTime] = useState(false);
-
-	const calculateElapsedTime = (startTime, stopTime, minSessionLength) => {
-		const start = moment(startTime);
-		const stop = moment(stopTime);
-		const duration = moment.duration(stop.diff(start));
-		const hours = duration.asHours();
-		//return Math.round(hours * 4) / 4; // Round to nearest 0.25
-		return Math.round(hours * (1/minSessionLength)) / (1/minSessionLength); // Round to nearest 0.25
-	};
-
-	function updateStartTime(newStartTime) {
-		const updatedWorkSession = {
-			...currentWorkSession,
-			start_time: newStartTime
-		};
-		updateWorkSession(updatedWorkSession);
-	}
-
-	async function updateWorkSession(workSession) {
-		try {
-			const { data, error } = await supabase
-				.from('worksession')
-				.update([{ ...workSession }])
-				.eq('id', workSession.id)
-				.select();
-	
-			if (error) {
-				throw error;
-			}
-	
-			if (data && data.length > 0) {
-				refreshData('user useeffect');
-				setCurrentWorkSession(null);
-			}
-		} catch (error) {
-			console.log(error);
-		} finally {
-
-		}
-	}
-
-	async function saveWorkSession(workSession) {
-		try {
-			const { data, error } = await supabase
-				.from('worksession')
-				.insert([{ ...workSession }])
-				.select();
-
-			if (error) {
-				throw error;
-			}
-
-			if (data && data.length > 0) {
-				setCurrentWorkSession(data[0]); // Set currentWorkSession to the inserted work session with id
-			}
-		} catch (error) {
-			console.log(error);
-		}
-	}
-
-	function finishSession(session) {
-		const updatedWorkSession = {
-			...session,
-			//use format "2024-07-17T02:44:16.411+00:00"
-			stop_time: new Date().toISOString()
-		};
-		console.log('finishing session', updatedWorkSession);
-		updateWorkSession(updatedWorkSession);
-	}
-
-	function startWork(project) {
-		//if there is a current work session, finish it
-		if (currentWorkSession) {
-			finishSession(currentWorkSession);
-		}
-
-		//start a new work session
-		saveWorkSession({
-			project_id: project.id,
-			start_time: new Date().toISOString(),
-			stop_time: null,
-			user_id: user.id
-		});
-	}
+    const [initialRefresh, setInitialRefresh] = useState(false);
 
 	async function getUser() {
 		try {
-		  const {
-			data: { user }
-		  } = await supabase.auth.getUser();
-		  setUser(user);
-	  
-		  if (user) {
-			// Fetch the related record from the usersettings table
-			const { data, error } = await supabase
-			  .from('usersettings')
-			  .select('config')
-			  .eq('user_id', user.id)
-			  .single();
-	  
-			if (error && error.code === 'PGRST116') {
-			  // No row exists, create a new one
-			  const { data: newData, error: newError } = await supabase
-				.from('usersettings')
-				.insert({ user_id: user.id, config: {} })
-				.select()
-				.single();
-	  
-			  if (newError) {
-				throw newError;
-			  }
-	  
-			  setConfig(newData.config);
-			} else if (error) {
-			  throw error;
-			} else {
-			  setConfig(data.config);
-			}
-		  }
-		} catch (error) {
-		  console.log(error);
-		}
-	  }
-	  
-
-	async function getWorkSessions() {
-		try {
-			setLoadingWorkSessions(true);
-
-			const startOfToday = new Date();
-			startOfToday.setHours(0, 0, 0, 0); // Set to midnight of today
-
-			const endOfToday = new Date();
-			endOfToday.setHours(23, 59, 59, 999); // Set to the last millisecond of today
-
-			const { data, error } = await supabase
-				.from('worksession')
-				.select('*')
-				.eq('user_id', user?.id)
-				.gte('start_time', startOfToday.toISOString())
-				.lte('start_time', endOfToday.toISOString());
-
-			if (error) {
-				throw error;
-			}
-
-			//if there is a work session with no stop time, set it as the current work session
-			const newCurrentWorkSession = data.find((workSession) => !workSession.stop_time);
-			if (newCurrentWorkSession) {
-				console.log('FOUND CURRENT WORK SESSION', newCurrentWorkSession);
-				setCurrentWorkSession(newCurrentWorkSession);
-			}
-
-			//set work sessions
-			setWorkSessions(data);
+			const { data: { user } } = await supabase.auth.getUser();
+			setUser(user);
 		} catch (error) {
 			console.log(error);
-		} finally {
-			setLoadingWorkSessions(false);
-			setInitialWorkSessionLoad(false);
 		}
-	}
-
-	function refreshData(from = null) {
-		console.log('refreshing data from ', from);
-		getProjects();
-		getWorkSessions();
-		getUser();
 	}
 
 	async function getProjects() {
+        console.log('triggered')
 		try {
 			setLoadingProjects(true);
-			
-
-			let { data, error, status } = await supabase
+			const { data, error } = await supabase
 				.from('projects')
-				.select(`id, created_at, name, description, status, user_id, billable, seq, hidden`);
+				.select('id, created_at, name, description, status, user_id, billable, seq, hidden')
+				.eq('hidden', showArchived); // Show archived or active projects
 
-			if (error && status !== 406) {
+			if (error) {
 				throw error;
 			}
 
@@ -221,7 +49,6 @@ export default function ProjectsPage() {
 				setProjects(data);
 			}
 		} catch (error) {
-			//alert("Error loading messages!");
 			console.log(error);
 		} finally {
 			setInitialProjectLoad(false);
@@ -229,92 +56,49 @@ export default function ProjectsPage() {
 		}
 	}
 
-	const [initialRefresh, setInitialRefresh] = useState(false);
-
 	useEffect(() => {
-		if (user && !initialRefresh) {
-			refreshData('user useeffect');
+		if (user && (!initialRefresh)
+        ) {
+			getProjects();
 			setInitialRefresh(true);
 		}
-	}, [user]);
+	}, [user]); // Refresh projects when showArchived changes
+
+    useEffect(() => {
+        getProjects();
+    }
+    , [showArchived]); // Refresh projects when showArchived changes
 
 	useEffect(() => {
 		getUser();
 	}, []);
 
-	const currentTime = new Date().getHours();
-	// format the time as Tuesday, July 16, 2019
-	const dateTimeString = new Date().toLocaleDateString('en-US', {
-		weekday: 'long',
-		year: 'numeric',
-		month: 'long',
-		day: 'numeric'
-	});
-	// format as HH:MM:SS
-	//const formattedLiveTime =
-	const userName = 'Brad';
-	const greetingString =''
+	// Function to toggle archived state of a project
+	async function toggleArchiveProject(project) {
+		try {
+			const { error } = await supabase
+				.from('projects')
+				.update({ hidden: !project.hidden })
+				.eq('id', project.id);
 
-	const minSessionLength = config?.minSessionLength ?? 0.25;
-
-	const totalHours =
-		workSessions.reduce((acc, workSession) => {
-			const start = workSession.start_time ? new Date(workSession.start_time).getTime() : null;
-			const stop = workSession.stop_time ? new Date(workSession.stop_time).getTime() : null;
-
-			if (start !== null && stop !== null) {
-				const duration = (stop - start) / 1000 / 60 / 60; // Duration in hours
-				//const roundedDuration = Math.round(duration * 4) / 4; // Round to nearest 0.25
-				const roundedDuration = Math.round(duration * (1/minSessionLength)) / (1/minSessionLength); // Round to nearest minSessionLength
-				return acc + roundedDuration;
-			} else {
-				return acc; // Return current accumulator if either start_time or stop_time is null
+			if (error) {
+				throw error;
 			}
-		}, 0) ?? 0;
 
-	const totalBillableHours =
-		workSessions.reduce((acc, workSession) => {
-			const project = projects.find((project) => project.id === workSession.project_id);
-			if (project && project.billable) {
-				const start = workSession.start_time ? new Date(workSession.start_time).getTime() : null;
-				const stop = workSession.stop_time ? new Date(workSession.stop_time).getTime() : null;
-
-				if (start !== null && stop !== null) {
-					const duration = (stop - start) / 1000 / 60 / 60; // Duration in hours
-					const roundedDuration = Math.round(duration * (1/minSessionLength)) / (1/minSessionLength); // Round to nearest minSessionLength
-					return acc + roundedDuration;
-				}
-			}
-			return acc;
-		}, 0) ?? 0;
-
-	/*{
-      id: 1,
-      project: 1,
-      startTime: new Date('7/16/2024 10:00:00'),
-      endTime: null
-    }*/
-
-	const currentProject = projects.find((project) => project.id === currentWorkSession?.project_id);
-	const workingOnString = currentProject ? `${currentProject.name}` : 'Select a project to start tracking!';
+			getProjects(); // Refresh projects after toggling archive state
+		} catch (error) {
+			console.log(error);
+		}
+	}
 
 	const projectLimitAmount = 5;
-	const filteredProjects = projects?.filter((project) => !project.hidden) ?? []; //project.hidden
-	const sortedProjects =
-		filteredProjects?.sort((a, b) => {
-			if (a.billable === b.billable) {
-				return (a.seq ?? 0) - (b.seq ?? 0);
-			}
-			return a.billable ? -1 : 1;
-		}) ?? [];
-
+    // sort by billable
+    const sortedProjects = projects.sort((a, b) => (a.billable === b.billable) ? 0 : a.billable ? -1 : 1);
 	const projectsToShow = showAll || canEdit ? sortedProjects : sortedProjects.slice(0, projectLimitAmount);
-	//get a count of projects hidden
-	const hiddenProjectsCount = sortedProjects.length - projectsToShow.length;
+	const hiddenProjectsCount = projects.length - projectsToShow.length;
 
 	return (
 		<Container>
-
 			<Row>
 				<Col>
                     <Row>
@@ -323,35 +107,27 @@ export default function ProjectsPage() {
                     </Row>
 					<Row>
 						<Col>
-							<h3 className="mb-0">My Projects</h3>
+							<h3 className="mb-0">{showArchived ? 'Archived Projects' : 'My Projects'}</h3>
 						</Col>
-                        <Col xs="auto">
+						<Col xs="auto">
 							<Button
 								style={{ float: 'right', width: '200px' }}
-								
-								color={canEdit ? 'secondary' : 'clear'}
-								onClick={() => {
-									setCanEdit(!canEdit);
-								}}
+								color={showArchived ? 'primary' : 'clear'}
+								onClick={() => setShowArchived(!showArchived)}
 							>
-								{canEdit ? (
-									<>
-										<IconCheck /> Done Editing
-									</>
-								) : (
-									<>
-										<IconPencil /> Manage Projects
-									</>
-								)}
+								{showArchived ? <><IconArrowLeft/>Back to Projects</> : <><IconArchive /> Archived Projects</>}
 							</Button>
 						</Col>
-						<Col xs="auto"> 
+
+                        
+						<Col xs="auto">
 							<Button
 								style={{ float: 'right', width: '200px' }}
 								onClick={() => {
 									setCreateModal(true);
 								}}
 								color="primary"
+                                disabled={showArchived}
 							>
 								<IconPlus /> Add Project
 							</Button>
@@ -361,42 +137,39 @@ export default function ProjectsPage() {
 								toggle={() => setEditModal(!editModal)}
 								user_id={user?.id}
 								projectData={editingProject}
-								refreshData={refreshData}
+								refreshData={getProjects}
 							/>
 						</Col>
+                        
 					</Row>
 					<Row>
                         <div style={{ height: '1rem' }}></div>
                     </Row>
-					{loadingProjects && initialProjectLoad && (!projects || projects.length == 0) ? (
+					{loadingProjects && initialProjectLoad ? (
 						<>
-						<LoadingPlaceholder width='100%' height='45px' cornerRadius='5px' className='mt-2'/>
-						<LoadingPlaceholder width='100%' height='45px' cornerRadius='5px' className='mt-2' />
-						<LoadingPlaceholder width='100%' height='45px' cornerRadius='5px' className='mt-2'/>
-						<LoadingPlaceholder width='100%' height='45px' cornerRadius='5px' className='mt-2'/>
-						<LoadingPlaceholder width='100%' height='45px' cornerRadius='5px' className='mt-2'/>
+							<LoadingPlaceholder width='100%' height='45px' cornerRadius='5px' className='mt-2' />
+							<LoadingPlaceholder width='100%' height='45px' cornerRadius='5px' className='mt-2' />
+							<LoadingPlaceholder width='100%' height='45px' cornerRadius='5px' className='mt-2' />
+							<LoadingPlaceholder width='100%' height='45px' cornerRadius='5px' className='mt-2' />
+							<LoadingPlaceholder width='100%' height='45px' cornerRadius='5px' className='mt-2' />
 						</>
-
 					) : (
-						projectsToShow.map((project) => (
+						projectsToShow?.map((project) => (
 							<ProjectCard
 								key={project.id}
-								currentWorkSession={currentWorkSession}
-								startWork={startWork}
 								project={project}
-								canEdit={canEdit}
+								canEdit={true}
 								setEditingProject={setEditingProject}
 								setEditModal={setEditModal}
-								refreshData={refreshData}
-                                disableClick
+								refreshData={getProjects}
+								disableClick
+								toggleArchive={() => toggleArchiveProject(project)} // Add archive toggle function
+								isArchived={showArchived}
 							/>
 						))
 					)}
 					<Row>
-						<Col
-							//center the contents horizontally
-							className="d-flex justify-content-center"
-						>
+						<Col className="d-flex justify-content-center">
 							<>
 								{!canEdit && !showAll && projects.length > projectLimitAmount && (
 									<Button color="secondary" style={{ width: '50%' }} outline onClick={() => setShowAll(true)} className="mt-3 mb-5">
@@ -414,11 +187,7 @@ export default function ProjectsPage() {
 				</Col>
 			</Row>
 			<Row>
-				<div
-					style={{
-						height: '50px'
-					}}
-				></div>
+				<div style={{ height: '50px' }}></div>
 			</Row>
 		</Container>
 	);

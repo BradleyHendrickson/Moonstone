@@ -136,9 +136,9 @@ export default function EditProjectModal({ isOpen, toggle, user_id, projectData,
                 </Form>
             </ModalBody>
             <ModalFooter>
+                <Button color="secondary" onClick={toggle} disabled={loading} style={{width:"150px"}}>Cancel</Button>
                 <ButtonSpinner color="danger" onClick={archiveProject} loading={loadingArchiveProject} disabled={loading} style={{width:"150px"}}>Archive Project</ButtonSpinner>
                 <ButtonSpinner color="primary" onClick={updateProject} loading={loadingUpdateProject} disabled={loading} style={{width:"150px"}}>Save Changes</ButtonSpinner>
-                <Button color="secondary" onClick={toggle} disabled={loading} style={{width:"150px"}}>Cancel</Button>
             </ModalFooter>
         </Modal>
     );
