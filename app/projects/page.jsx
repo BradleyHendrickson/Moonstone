@@ -1,6 +1,6 @@
 'use client'
 import { Container, Row, Col, Button } from 'reactstrap';
-import React, { use, useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { createClient } from '@/utils/supabase/client';
 import AddProjectModal from '@/components/entry/AddProjectModal';
 import EditProjectModal from '@/components/entry/EditProjectModal';
@@ -21,7 +21,7 @@ export default function ProjectsPage() {
 	const [showAll, setShowAll] = useState(false);
 	const [showArchived, setShowArchived] = useState(false); // New state for archived projects view
 	const [initialProjectLoad, setInitialProjectLoad] = useState(true);
-    const [initialRefresh, setInitialRefresh] = useState(false);
+	const [initialRefresh, setInitialRefresh] = useState(false);
 
 	async function getUser() {
 		try {
@@ -33,7 +33,6 @@ export default function ProjectsPage() {
 	}
 
 	async function getProjects() {
-        console.log('triggered')
 		try {
 			setLoadingProjects(true);
 			const { data, error } = await supabase
@@ -57,17 +56,15 @@ export default function ProjectsPage() {
 	}
 
 	useEffect(() => {
-		if (user && (!initialRefresh)
-        ) {
+		if (user && (!initialRefresh)) {
 			getProjects();
 			setInitialRefresh(true);
 		}
 	}, [user]); // Refresh projects when showArchived changes
 
-    useEffect(() => {
-        getProjects();
-    }
-    , [showArchived]); // Refresh projects when showArchived changes
+	useEffect(() => {
+		getProjects();
+	}, [showArchived]); // Refresh projects when showArchived changes
 
 	useEffect(() => {
 		getUser();
@@ -91,9 +88,8 @@ export default function ProjectsPage() {
 		}
 	}
 
-	const projectLimitAmount = 5;
-    // sort by billable
-    const sortedProjects = projects.sort((a, b) => (a.billable === b.billable) ? 0 : a.billable ? -1 : 1);
+	const projectLimitAmount = 10;
+	const sortedProjects = projects.sort((a, b) => (a.billable === b.billable) ? 0 : a.billable ? -1 : 1);
 	const projectsToShow = showAll || canEdit ? sortedProjects : sortedProjects.slice(0, projectLimitAmount);
 	const hiddenProjectsCount = projects.length - projectsToShow.length;
 
@@ -101,50 +97,39 @@ export default function ProjectsPage() {
 		<Container>
 			<Row>
 				<Col>
-                    <Row>
-                        {/* ADD 2rem of empty space in this row  */}
-                        <div style={{ height: '4rem' }}></div>
-                    </Row>
 					<Row>
-						<Col>
-							<h3 className="mb-0">{showArchived ? 'Archived Projects' : 'My Projects'}</h3>
-						</Col>
-						<Col xs="auto">
-							<Button
-								style={{ float: 'right', width: '200px' }}
-								color={showArchived ? 'primary' : 'clear'}
-								onClick={() => setShowArchived(!showArchived)}
-							>
-								{showArchived ? <><IconArrowLeft/>Back to Projects</> : <><IconArchive /> Archived Projects</>}
-							</Button>
-						</Col>
-
-                        
-						<Col xs="auto">
-							<Button
-								style={{ float: 'right', width: '200px' }}
-								onClick={() => {
-									setCreateModal(true);
-								}}
-								color="primary"
-                                disabled={showArchived}
-							>
-								<IconPlus /> Add Project
-							</Button>
-							<AddProjectModal isOpen={createModal} toggle={() => setCreateModal(!createModal)} user_id={user?.id} refreshData={getProjects} />
-							<EditProjectModal
-								isOpen={editModal}
-								toggle={() => setEditModal(!editModal)}
-								user_id={user?.id}
-								projectData={editingProject}
-								refreshData={getProjects}
-							/>
-						</Col>
-                        
+						{/* ADD 2rem of empty space in this row  */}
+						<div style={{ height: '4rem' }}></div>
 					</Row>
 					<Row>
-                        <div style={{ height: '1rem' }}></div>
-                    </Row>
+						<Col>
+							<h3 className="mb-4">{showArchived ? 'Archived Projects' : 'My Projects'}</h3>
+						</Col>
+						<Col lg="6" xl="auto">
+							{/* Flex container for header buttons */}
+							<div className="d-flex justify-content-between flex-wrap">
+								<Button
+									style={{ width: '200px' }}
+									color={showArchived ? 'primary' : 'clear'}
+									onClick={() => setShowArchived(!showArchived)}
+								>
+									{showArchived ? <><IconArrowLeft /> Back to Projects</> : <><IconArchive /> Archived Projects</>}
+								</Button>
+
+								<Button
+									style={{ width: '200px' }}
+									onClick={() => setCreateModal(true)}
+									color="primary"
+									disabled={showArchived}
+								>
+									<IconPlus /> Add Project
+								</Button>
+							</div>
+						</Col>
+					</Row>
+					<Row>
+						<div style={{ height: '1rem' }}></div>
+					</Row>
 					{loadingProjects && initialProjectLoad ? (
 						<>
 							<LoadingPlaceholder width='100%' height='45px' cornerRadius='5px' className='mt-2' />
@@ -177,7 +162,7 @@ export default function ProjectsPage() {
 									</Button>
 								)}
 								{!canEdit && showAll && (
-									<Button color="secondary" style={{ width: '50%' }} onClick={() => setShowAll(false)} className="mt-3  mb-5">
+									<Button color="secondary" style={{ width: '50%' }} onClick={() => setShowAll(false)} className="mt-3 mb-5">
 										Show Less <IconCaretUp />
 									</Button>
 								)}
