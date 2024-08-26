@@ -71,7 +71,7 @@ export default function StartedTime({ startTime, updateStartTime, muted, project
                             value: selectedProject,
                             label:  selectedProject ?  selectedProject.name : '...'
                         }}
-                        isClearable
+                        //isClearable
                     />
 					</FormGroup>
 					<FormGroup>
