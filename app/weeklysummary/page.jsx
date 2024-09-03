@@ -177,6 +177,106 @@ export default function WeeklyWorkSessions() {
 
 	const minSessionLength = config?.minSessionLength ?? 0.25;
 
+	const renderWorkSessionCardsByDayAndProject = () => {
+		const daysOfWeek = [];
+		let currentDate = selectedWeek.clone().startOf('week');
+	
+		while (currentDate <= selectedWeek.clone().endOf('week')) {
+			daysOfWeek.push(currentDate.clone());
+			currentDate.add(1, 'day');
+		}
+	
+		return daysOfWeek.map((day) => {
+			const daySessions = workSessions.filter((session) => moment(session.start_time).isSame(day, 'day'));
+			const projectsInDay = [...new Set(daySessions.map((session) => session.project_id))];
+	
+			const totalHours = daySessions.reduce((total, session) => {
+				const elapsedTime = calculateElapsedTime(session.start_time, session.stop_time, minSessionLength);
+				return total + elapsedTime;
+			}, 0);
+	
+			const isZeroHours = totalHours === 0;
+			const textColor = isZeroHours ? '#808080' : 'black';
+	
+			return (
+				<div key={day.format('YYYY-MM-DD')} className="mb-1">
+					<div
+						className="day-header"
+						style={{ cursor: isZeroHours ? 'default' : 'pointer', padding: '8px 0' }}
+						onClick={() => !isZeroHours && toggleDayCollapse(day.format('YYYY-MM-DD'))}
+					>
+						<Row>
+							<Col xs="auto">
+								<h4 className="float-left mb-0" style={{ color: textColor }}>
+									{day.format('dddd, MMMM Do')}
+								</h4>
+							</Col>
+							<Col>
+								<p className="float-right mb-0" style={{ color: textColor, float: 'right', fontSize: '18px' }}>
+									<strong className={poppins.className}>{totalHours.toFixed(2)} hrs</strong>
+								</p>
+							</Col>
+						</Row>
+	
+						<div className="clearfix"></div>
+					</div>
+					{!isZeroHours && (
+						<Collapse isOpen={expandedDays[day.format('YYYY-MM-DD')]}>
+							{projectsInDay.map((projectId) => {
+								const projectSessions = daySessions.filter((session) => session.project_id === projectId);
+								const projectTotalHours = projectSessions.reduce((total, session) => {
+									const elapsedTime = calculateElapsedTime(session.start_time, session.stop_time, minSessionLength);
+									return total + elapsedTime;
+								}, 0);
+	
+								const project = projects.find((p) => p.id === projectId);
+								const projectName = project ? project.name : 'Unknown Project';
+								const isBillable = project?.billable;
+	
+								return (
+									<div key={projectId} className="mb-1">
+										<div
+											className="project-header"
+											style={{ padding: '2px 16px', cursor: 'pointer' }}
+											onClick={() => toggleProjectCollapse(projectId)}  // Toggle project collapse on click
+										>
+											<Row>
+												<Col xs="auto">
+													<h6 className="mb-0 flex-grow-1 project-name">{projectName}</h6>
+												</Col>
+												<Col className="p-0">
+													<p className="float-right mb-0" style={{ color: textColor, float: 'right', fontSize: '16px' }}>
+														{projectTotalHours.toFixed(2)} hrs
+													</p>
+												</Col>
+											</Row>
+										</div>
+										<Collapse isOpen={expandedProjects.includes(projectId)}>  {/* Check if project is expanded */}
+											{projectSessions.map((session) => (
+												<div style={{marginLeft:"2rem"}}>
+												<WorkSessionCard
+													key={session.id}
+													workSession={session}
+													deleteWorkSession={deleteWorkSession}
+													updateWorkSession={updateWorkSession}
+													projectName={session.projectName}
+													project={project}
+													minSessionLength={minSessionLength}
+												/></div>
+											))}
+										</Collapse>
+									</div>
+								);
+							})}
+						</Collapse>
+					)}
+				</div>
+			);
+		});
+	};
+	
+	
+
 	const renderWorkSessionCards = () => {
 		const daysOfWeek = [];
 		let currentDate = selectedWeek.clone().startOf('week');
@@ -318,6 +418,15 @@ export default function WeeklyWorkSessions() {
 	const weekStartString = selectedWeek.clone().startOf('week').format('MMMM Do, YYYY');
 	const weekEndString = selectedWeek.clone().endOf('week').format('MMMM Do, YYYY');
 	
+	const [expandedProjects, setExpandedProjects] = useState([]); // Tracks which projects are expanded
+
+	const toggleProjectCollapse = (projectName) => {
+		setExpandedProjects((prev) =>
+			prev.includes(projectName)
+				? prev.filter((name) => name !== projectName)
+				: [...prev, projectName]
+		);
+	};
 
 	return (
 		<Container className="mt-3">
@@ -378,7 +487,7 @@ export default function WeeklyWorkSessions() {
 				) : (
 					
 					<>
-						<Col>{viewMode === 'daily' ? renderWorkSessionCards() : renderProjectTotals()}</Col>
+						<Col>{viewMode === 'daily' ? renderWorkSessionCardsByDayAndProject() : renderProjectTotals()}</Col>
 						<Col md={4} className="mt-2 mt-md-0">
 							<Card className='mb-5'>
 								<CardBody>
