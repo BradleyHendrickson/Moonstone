@@ -12,11 +12,6 @@ export default async function Index() {
 		data: { user }
 	} = await supabase.auth.getUser();
 
-  let { data, error } = await supabase
-  .rpc('get_worksession_count')
-  if (error) console.error(error)
-  else console.log(data)
-
 	return (
 		<Container>
 			<Row
