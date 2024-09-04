@@ -44,6 +44,11 @@ function ProjectCard({ project, canEdit, setEditingProject, setEditModal, refres
 		toggleArchive();
 	};
 
+	const editClick = (event) => {
+		setEditingProject(project);
+		setEditModal(true);
+	}
+
 	return (
 		<>
 			<Card
@@ -51,10 +56,10 @@ function ProjectCard({ project, canEdit, setEditingProject, setEditModal, refres
 				className={`mt-2 ${isHovered ? 'highlight' : ''} ${currentWorkSession?.project_id === project.id ? 'pulsing-card' : ''}`}
 				onMouseEnter={() => setIsHovered(true)}
 				onMouseLeave={() => setIsHovered(false)}
-				onClick={handleCardClick}
+				onClick={editClick}
 				style={{
 					cursor: canEdit ? 'default' : 'pointer',
-					backgroundColor: isHovered && !canEdit ? '#e0e0e0' : '#F0F0F0'
+					backgroundColor: isHovered && canEdit ? '#e0e0e0' : '#F0F0F0'
 				}}
 			>
 				<CardBody className="p-2">
@@ -65,23 +70,6 @@ function ProjectCard({ project, canEdit, setEditingProject, setEditModal, refres
 						{project.billable && (
 							<Col xs="auto">
 								<IconCurrencyDollar title="Billable Project" />
-							</Col>
-						)}
-						{canEdit && !isArchived && (
-							<Col xs="auto">
-								<Button
-									size="sm"
-									color="secondary"
-									outline
-									style={{ float: 'right', marginRight: '5px', width: "50px" }}
-									onClick={(event) => {
-										event.stopPropagation();
-										setEditingProject(project);
-										setEditModal(true);
-									}}
-								>
-									Edit
-								</Button>
 							</Col>
 						)}
 						{isArchived && (

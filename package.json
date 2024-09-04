@@ -6,7 +6,6 @@
     "start": "next start"
   },
   "dependencies": {
-    "@next/font": "^14.2.5",
     "@supabase/ssr": "latest",
     "@supabase/supabase-js": "latest",
     "@tabler/icons-react": "^3.9.0",

@@ -107,9 +107,9 @@ export default function ProjectsPage() {
 						</Col>
 						<Col lg="6" xl="auto">
 							{/* Flex container for header buttons */}
-							<div className="d-flex justify-content-between flex-wrap">
+							<div className="d-flex flex-column flex-lg-row">
 								<Button
-									style={{ width: '200px' }}
+									className="mb-2 mb-lg-0 me-lg-2"
 									color={showArchived ? 'primary' : 'clear'}
 									onClick={() => setShowArchived(!showArchived)}
 								>
@@ -117,7 +117,6 @@ export default function ProjectsPage() {
 								</Button>
 
 								<Button
-									style={{ width: '200px' }}
 									onClick={() => setCreateModal(true)}
 									color="primary"
 									disabled={showArchived}
@@ -126,6 +125,7 @@ export default function ProjectsPage() {
 								</Button>
 							</div>
 						</Col>
+
 					</Row>
 					<Row>
 						<div style={{ height: '1rem' }}></div>
@@ -153,6 +153,13 @@ export default function ProjectsPage() {
 							/>
 						))
 					)}
+					<EditProjectModal
+						isOpen={editModal}
+						toggle={() => setEditModal(!editModal)}
+						user_id={user?.id}
+						projectData={editingProject}
+						refreshData={getProjects}
+						/>
 					<Row>
 						<Col className="d-flex justify-content-center">
 							<>
