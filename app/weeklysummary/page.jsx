@@ -4,7 +4,7 @@ import { Container, Row, Col, Spinner, Button, Card, CardBody, Collapse } from '
 import moment from 'moment';
 import WorkSessionCard from '@/components/entry/WorkSessionCard';
 import { createClient } from '@/utils/supabase/client';
-import { IconCaretLeft, IconCaretRight } from '@tabler/icons-react';
+import { IconCaretLeft, IconCaretRight, IconArrowLeft, IconArrowRight } from '@tabler/icons-react';
 import './styles.css';
 import { poppins } from '@/utils/fonts';
 export default function WeeklyWorkSessions() {
@@ -430,42 +430,43 @@ export default function WeeklyWorkSessions() {
 
 	return (
 		<Container className="mt-3">
-			<Row className="mb-4">
-				<Col>
-					<Row>
-						<Col>
-							<h2>Week Summary</h2>
-						</Col>
-					</Row>
-					<Row>
-						<Col>
-							<h5>
-								{weekStartString} - {weekEndString}
-							</h5>
-						</Col>
-					</Row>
-				</Col>
+			<Row className="mb-4 align-items-center">
 				<Col xs="12">
-					<Row>
-						<Col xs="6" sm="auto">
-							<Button color="secondary" onClick={() => setSelectedWeek(selectedWeek.clone().subtract(1, 'week'))} style={{ width: '100%', minWidth: "150px" }} className='mb-2'>
-								<IconCaretLeft />
-							</Button>
-						</Col>
-						<Col xs="6" sm="auto">
-							<Button color="secondary" onClick={() => setSelectedWeek(selectedWeek.clone().add(1, 'week'))} style={{ width: '100%', minWidth: "150px" }} className='mb-2'>
-								<IconCaretRight />
-							</Button>
-						</Col>
-						<Col xs="12" sm="auto" >
-							<Button color="secondary" outline 
-							onClick={() => setViewMode(viewMode === 'daily' ? 'project' : 'daily')} style={{ width: '100%', minWidth: "200px" }}>
-								{viewMode === 'daily' ? 'View Totals by Project' : 'View Daily Totals'}
-							</Button>
-						</Col>
-					</Row>
+					<h2 className="mb-3 text-center text-sm-start">Week Summary</h2>
+				</Col>
+
+				<Col className="d-flex justify-content-between">
+					<Button
+						color="secondary"
+						onClick={() => setSelectedWeek(selectedWeek.clone().subtract(1, 'week'))}
+						style={{ minWidth: "40px" }}
+					>
+						<IconArrowLeft />
+					</Button>
+					<h5 className="mx-3 my-auto">
+						{weekStartString} - {weekEndString}
+					</h5>
+					<Button
+						color="secondary"
+						onClick={() => setSelectedWeek(selectedWeek.clone().add(1, 'week'))}
+						style={{ minWidth: "40px" }}
+					>
+						<IconArrowRight />
+					</Button>
+				</Col>
+
+				<Col md={4} className="mt-2 mt-md-0">
+					<Button
+						color="secondary"
+						outline
+						onClick={() => setViewMode(viewMode === 'daily' ? 'project' : 'daily')}
+						style={{ width: '100%', minWidth: "200px", float:"right" }}
+					>
+						{viewMode === 'daily' ? 'View Totals by Project' : 'View Daily Totals'}
+					</Button>
 				</Col>
 			</Row>
+
 
 			<Row>
 				{loading ? (

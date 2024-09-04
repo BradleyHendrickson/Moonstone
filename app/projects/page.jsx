@@ -4,7 +4,7 @@ import React, { useEffect, useState } from 'react';
 import { createClient } from '@/utils/supabase/client';
 import AddProjectModal from '@/components/entry/AddProjectModal';
 import EditProjectModal from '@/components/entry/EditProjectModal';
-import { IconPlus, IconPencil, IconCheck, IconCaretDown, IconCaretUp, IconArchive, IconArrowLeft } from '@tabler/icons-react';
+import { IconPlus, IconPencil, IconCheck, IconCaretDown, IconCaretUp, IconArchive, IconArrowLeft, IconArrowRight } from '@tabler/icons-react';
 import ProjectCard from '@/components/entry/ProjectCard';
 import LoadingPlaceholder from '@/components/interface/LoadingPlaceholder';
 
