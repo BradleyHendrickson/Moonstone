@@ -43,9 +43,9 @@ export default async function Index() {
 				</Col>
 			</Row>
 
-			<Row>
+			<Row className="justify-content-center">
 				<Col>
-					<h5>
+					<h5 className='mt-3'>
 						🐛 Found a bug? 
 					</h5>
 					<p>
