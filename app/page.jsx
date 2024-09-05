@@ -43,6 +43,17 @@ export default async function Index() {
 				</Col>
 			</Row>
 
+			<Row>
+				<Col>
+					<h5>
+						🐛 Found a bug? 
+					</h5>
+					<p>
+						Please report it on the <Link href="https://github.com/BradleyHendrickson/Moonstone/issues">Issue Board</Link>
+					</p>
+				</Col>
+			</Row>
+
 			<div className="footer-text">Chatoyant Solutions</div>
 		</Container>
 	);
