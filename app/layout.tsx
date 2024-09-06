@@ -6,7 +6,7 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import TopNav from '../components/navigation/topnav'
 import { poppins } from "@/utils/fonts";
  
-
+import { Analytics } from "@vercel/analytics/react"
 
 export const metadata: Metadata = {
   title: "Moonstone",
@@ -20,9 +20,11 @@ export default function RootLayout({
 }>) {
   return (
     <html lang='en'>
+      
       <body className={poppins.className}>
         <TopNav />
         {children}
+        <Analytics />
       </body>
     </html>
   );
