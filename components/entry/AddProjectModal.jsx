@@ -35,36 +35,39 @@ export default function AddProjectModal({isOpen, toggle, user_id, refreshData}) 
     }
 
     async function addProject() {
-        
-
         try {
-
-            setLoadingAddProject(true)
-            await new Promise(r => setTimeout(r, 100))
-
+            setLoadingAddProject(true);
+            await new Promise(r => setTimeout(r, 100));
+    
             let { data, error } = await supabase
-            .from("projects")
-            .insert({
-                name: newProject.name,
-                description: newProject.description,
-                status: newProject.status,
-                user_id: user_id,
-                billable: newProject.billable
-            })
-
-            setLoadingAddProject(false)
-
+                .from("projects")
+                .insert({
+                    name: newProject.name,
+                    description: newProject.description,
+                    status: newProject.status,
+                    user_id: user_id,
+                    billable: newProject.billable
+                })
+                .select(); // Selects the inserted project(s) after insertion
+    
+            setLoadingAddProject(false);
+    
             if (error) {
-            throw error;
+                throw error;
+            }
+    
+            // Assuming that the insert operation returns the inserted project(s)
+            if (data && data.length > 0) {
+                refreshData(data[0]); // Use the inserted project for refreshing data
             }
         } catch (error) {
             alert("Error adding project");
             console.log(error);
         } finally {
-            refreshData(newProject)
             toggle();
         }
     }
+    
 
     return (
         <Modal isOpen={isOpen} toggle={toggle}>
