@@ -33,7 +33,7 @@ export default async function Index() {
 						</li>
 					</ul>
 
-					<h5 className="mt-5">🐛 Found a bug? 💡 Want to request a feature?</h5>
+					<h5 className="mt-5">💡 Thought of a feature? 🐛 Found a bug? </h5>
 					<p>
 						Create an issue on the <Link href="https://github.com/BradleyHendrickson/Moonstone/issues">Issue Board</Link>.
 					</p>
