@@ -1,11 +1,14 @@
 import React, { useState } from 'react';
 import { Card, CardBody, CardTitle, Button, Row, Col, Modal, ModalHeader, ModalBody, ModalFooter } from 'reactstrap';
 import { IconGripVertical, IconCurrencyDollar } from '@tabler/icons-react';
+import ButtonSpinner from '@/components/interface/ButtonSpinner';
 
 function ProjectCard({ project, canEdit, setEditingProject, setEditModal, refreshData, startWork, currentWorkSession, archiveProject, onClick, disableClick, isArchived, toggleArchive }) {
 	const [isHovered, setIsHovered] = useState(false);
 	const [isWorkSessionModalOpen, setIsWorkSessionModalOpen] = useState(false);
 	const [isRestoreModalOpen, setIsRestoreModalOpen] = useState(false);
+
+	const [loadingArchive, setLoadingArchive] = useState(false);
 
 	const toggleWorkSessionModal = () => setIsWorkSessionModalOpen(!isWorkSessionModalOpen);
 	const toggleRestoreModal = () => setIsRestoreModalOpen(!isRestoreModalOpen);
@@ -39,11 +42,19 @@ function ProjectCard({ project, canEdit, setEditingProject, setEditModal, refres
 		setIsHovered(false);
 	};
 
-	const confirmRestore = () => {
-		toggleRestoreModal();
-		toggleArchive();
-	};
-
+	const confirmRestore = async () => {
+		setLoadingArchive(true);  // Start loading spinner
+	
+		try {
+			await toggleArchive();  // Perform the archive toggle (restore action)
+		} catch (error) {
+			console.error("Error restoring the project:", error);
+		} finally {
+			setLoadingArchive(false);  // Stop loading spinner
+			toggleRestoreModal();  // Close the modal
+		}
+	}
+	
 	const editClick = (event) => {
 		setEditingProject(project);
 		setEditModal(true);
@@ -59,8 +70,12 @@ function ProjectCard({ project, canEdit, setEditingProject, setEditModal, refres
 				onClick={editClick}
 				style={{
 					cursor: canEdit ? 'default' : 'pointer',
-					backgroundColor: isHovered && canEdit ? '#e0e0e0' : '#F0F0F0'
+					backgroundColor: isArchived 
+						? (isHovered && canEdit ? '#f5f5f5' : '#fafafa') // Lighter colors for archived
+						: (isHovered && canEdit ? '#e0e0e0' : '#F0F0F0'), // Current colors for non-archived
+						border: isArchived ? '1px dashed darkgrey' : undefined
 				}}
+
 			>
 				<CardBody className="p-2">
 					<Row>
@@ -110,8 +125,8 @@ function ProjectCard({ project, canEdit, setEditingProject, setEditModal, refres
 					Are you sure you want to restore the project "{project.name}"?
 				</ModalBody>
 				<ModalFooter>
-					<Button color="secondary" onClick={toggleRestoreModal}>Cancel</Button>
-					<Button color="primary" onClick={confirmRestore}>Yes, Restore</Button>
+					<Button color="secondary" disabled={loadingArchive} onClick={toggleRestoreModal}>Cancel</Button>
+					<ButtonSpinner loading = {loadingArchive} color="primary" disabled={loadingArchive} onClick={confirmRestore}>Yes, Restore</ButtonSpinner>
 				</ModalFooter>
 			</Modal>
 		</>

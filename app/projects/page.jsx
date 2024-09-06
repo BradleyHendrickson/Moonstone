@@ -75,18 +75,20 @@ export default function ProjectsPage() {
 		try {
 			const { error } = await supabase
 				.from('projects')
-				.update({ hidden: !project.hidden })
+				.update({ hidden: !project.hidden }) // Toggle the 'hidden' state
 				.eq('id', project.id);
 
 			if (error) {
-				throw error;
+				throw error; // Throw the error to be caught by the caller
 			}
 
 			getProjects(); // Refresh projects after toggling archive state
 		} catch (error) {
-			console.log(error);
+			console.log('Error toggling archive state:', error);
+			throw error; // Re-throw the error so it can be caught in the calling function
 		}
 	}
+
 
 	const projectLimitAmount = 10;
 	const sortedProjects = projects.sort((a, b) => (a.billable === b.billable) ? 0 : a.billable ? -1 : 1);
