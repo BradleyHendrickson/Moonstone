@@ -432,7 +432,7 @@ export default function WeeklyWorkSessions() {
 		<Container className="mt-3">
 			<Row className="mb-4 align-items-center">
 				<Col xs="12">
-					<h2 className="mb-3 text-center text-sm-start">Week Summary</h2>
+					<h2 className="mb-3 mt-3 mt-md-5 text-center text-sm-start">Weekly Summary</h2>
 				</Col>
 
 				<Col className="d-flex justify-content-between">

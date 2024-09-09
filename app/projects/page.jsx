@@ -100,16 +100,12 @@ export default function ProjectsPage() {
 			<Row>
 				<Col>
 					<Row>
-						{/* ADD 2rem of empty space in this row  */}
-						<div style={{ height: '4rem' }}></div>
-					</Row>
-					<Row>
 						<Col>
-							<h3 className="mb-4">{showArchived ? 'Archived Projects' : 'My Projects'}</h3>
+							<h3 className="mt-3 mt-md-5">{showArchived ? 'Archived Projects' : 'My Projects'}</h3>
 						</Col>
 						<Col lg="6" xl="auto">
 							{/* Flex container for header buttons */}
-							<div className="d-flex flex-column flex-lg-row">
+							<div className="d-flex flex-column flex-lg-row mt-3 mt-md-5">
 								<Button
 									className="mb-2 mb-lg-0 me-lg-2"
 									color={showArchived ? 'primary' : 'clear'}
