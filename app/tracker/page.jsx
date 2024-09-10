@@ -237,27 +237,28 @@ export default function ProjectManager() {
 	async function getProjects() {
 		try {
 			setLoadingProjects(true);
-			
-
+	
 			let { data, error, status } = await supabase
-				.from('projects')
-				.select(`id, created_at, name, description, status, user_id, billable, seq, hidden`);
-
+				.from('projects_by_most_recent')
+				.select(`
+					id, created_at, name, description, status, user_id, billable, seq, hidden, last_used, new
+				`)
+	
 			if (error && status !== 406) {
 				throw error;
 			}
-
+	
 			if (data) {
 				setProjects(data);
 			}
 		} catch (error) {
-			//alert("Error loading messages!");
 			console.log(error);
 		} finally {
 			setInitialProjectLoad(false);
 			setLoadingProjects(false);
 		}
 	}
+	
 
 	const [initialRefresh, setInitialRefresh] = useState(false);
 

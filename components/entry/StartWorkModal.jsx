@@ -81,25 +81,8 @@ export default function StartWorkModal({ isOpen, toggle, projectData, supabaseCl
             <Modal isOpen={isOpen} toggle={toggle}>
                 <ModalHeader toggle={toggle}>Start Work Session</ModalHeader>
                 <ModalBody>
-                    <h6 className="mt-2">Recent Projects</h6>
-                    {loadingProjects ? (
-                        <div>Loading...</div>
-                    ) : (
-                        <>
-                            {recentProjects.map(project => (
-                                <ProjectCard
-                                    key={project.id}
-                                    project={project}
-                                    isHovered={isHovered}
-                                    setIsHovered={setIsHovered}
-                                    startWork={() => {}}
-                                    onClick={() => setSelectedProject(project)}
-                                />
-                            ))}
-                        </>
-                    )}
 
-                    <Label for="project" className="mt-4">Select a project</Label>
+                    <Label for="project" className="mt-2">Select a project</Label>
                     <Select
                         options={projectSelections}
                         onChange={selectedOption => setSelectedProject(selectedOption ? selectedOption.value : null)}
