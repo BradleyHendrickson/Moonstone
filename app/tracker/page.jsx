@@ -23,20 +23,13 @@ export default function ProjectManager() {
 
 	const [user, setUser] = useState(null);
 	const [projects, setProjects] = useState([]);
-	const [loadingProjects, setLoadingProjects] = useState(true);
 	const [loadingWorkSessions, setLoadingWorkSessions] = useState(true);
 	const [canEdit, setCanEdit] = useState(false);
-	const [editingProject, setEditingProject] = useState(null);
-	const [createModal, setCreateModal] = useState(false);
-	const [editModal, setEditModal] = useState(false);
 	const [currentWorkSession, setCurrentWorkSession] = useState(null);
 	const [workSessions, setWorkSessions] = useState([]);
-	const [showAll, setShowAll] = useState(false);
 	const [config, setConfig] = useState({});
-	const [initialProjectLoad, setInitialProjectLoad] = useState(true);
+	const [loadingProjects, setLoadingProjects] = useState(true);
 	const [initialWorkSessionLoad, setInitialWorkSessionLoad] = useState(true);
-
-	const [loadingStartTime, setLoadingStartTime] = useState(false);
 
 	const [startWorkModal, setStartWorkModal] = useState(false);
 
@@ -254,7 +247,6 @@ export default function ProjectManager() {
 		} catch (error) {
 			console.log(error);
 		} finally {
-			setInitialProjectLoad(false);
 			setLoadingProjects(false);
 		}
 	}
@@ -348,8 +340,6 @@ export default function ProjectManager() {
 													Stop Session
 												</Button>
 											</Col>
-
-											{/* <Button color="danger">Pause</Button> */}
 										</Row>
 									) : (
 										<Row>

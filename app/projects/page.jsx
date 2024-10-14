@@ -8,6 +8,7 @@ import { IconPlus, IconPencil, IconCheck, IconCaretDown, IconCaretUp, IconArchiv
 import ProjectCard from '@/components/entry/ProjectCard';
 import LoadingPlaceholder from '@/components/interface/LoadingPlaceholder';
 
+
 export default function ProjectsPage() {
 	const supabase = createClient();
 
@@ -99,6 +100,14 @@ export default function ProjectsPage() {
 		<Container>
 			<Row>
 				<Col>
+					<AddProjectModal 
+
+						isOpen={createModal}
+						toggle={() => setCreateModal(!createModal)}
+						user_id={user?.id}
+						refreshData={getProjects}
+					/>
+
 					<Row>
 						<Col>
 							<h3 className="mt-3 mt-md-5">{showArchived ? 'Archived Projects' : 'My Projects'}</h3>
