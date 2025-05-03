@@ -24,7 +24,8 @@ const SelectProject = ({ supabase, value, onChange }) => {
 
             let { data, error, status } = await supabase
                 .from('projects')
-                .select(`id, created_at, name, description, status, user_id, billable, seq, hidden`);
+                .select(`id, created_at, name, description, status, user_id, billable, seq, hidden, worksessions(start_time)`)
+                .order('start_time', { foreignTable: 'worksessions', ascending: false });
 
             if (error && status !== 406) {
                 throw error;
@@ -45,7 +46,6 @@ const SelectProject = ({ supabase, value, onChange }) => {
         value: project,
         label: project.name
     }));
-    
 
     return (
         <FormGroup>
@@ -59,7 +59,6 @@ const SelectProject = ({ supabase, value, onChange }) => {
             />
         </FormGroup>
     );
-
 };
 
 export default SelectProject;

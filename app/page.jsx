@@ -37,6 +37,11 @@ export default async function Index() {
 					<p>
 						Create an issue on the <Link href="https://github.com/BradleyHendrickson/Moonstone/issues">Issue Board</Link>.
 					</p>
+
+					<h5 className="mt-5">Support Moonstone's Development</h5>
+					<a href='https://ko-fi.com/J3J714R6RN' target='_blank'>
+						<img height='36' style={{border:"0px", height:"50px"}} src='https://storage.ko-fi.com/cdn/kofi2.png?v=3' alt='Buy Me a Coffee at ko-fi.com' />
+						</a>
 				</Col>
 				<Col
 					xs="auto"

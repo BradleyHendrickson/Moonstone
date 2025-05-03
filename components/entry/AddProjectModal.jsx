@@ -58,6 +58,7 @@ export default function AddProjectModal({isOpen, toggle, user_id, refreshData}) 
     
             // Assuming that the insert operation returns the inserted project(s)
             if (data && data.length > 0) {
+                console.log('refreshing data', data[0]);
                 refreshData(data[0]); // Use the inserted project for refreshing data
             }
         } catch (error) {

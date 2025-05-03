@@ -86,7 +86,7 @@ const UserSettings = () => {
 		<Container>
 			<Row>
 				<Col>
-					<h2 className="mt-5">Settings</h2>
+					<h2 className="mt-3 mt-md-5">Settings</h2>
 
 				</Col>
 			</Row>

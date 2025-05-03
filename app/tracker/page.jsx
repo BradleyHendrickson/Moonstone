@@ -23,20 +23,13 @@ export default function ProjectManager() {
 
 	const [user, setUser] = useState(null);
 	const [projects, setProjects] = useState([]);
-	const [loadingProjects, setLoadingProjects] = useState(true);
 	const [loadingWorkSessions, setLoadingWorkSessions] = useState(true);
 	const [canEdit, setCanEdit] = useState(false);
-	const [editingProject, setEditingProject] = useState(null);
-	const [createModal, setCreateModal] = useState(false);
-	const [editModal, setEditModal] = useState(false);
 	const [currentWorkSession, setCurrentWorkSession] = useState(null);
 	const [workSessions, setWorkSessions] = useState([]);
-	const [showAll, setShowAll] = useState(false);
 	const [config, setConfig] = useState({});
-	const [initialProjectLoad, setInitialProjectLoad] = useState(true);
+	const [loadingProjects, setLoadingProjects] = useState(true);
 	const [initialWorkSessionLoad, setInitialWorkSessionLoad] = useState(true);
-
-	const [loadingStartTime, setLoadingStartTime] = useState(false);
 
 	const [startWorkModal, setStartWorkModal] = useState(false);
 
@@ -237,27 +230,27 @@ export default function ProjectManager() {
 	async function getProjects() {
 		try {
 			setLoadingProjects(true);
-			
-
+	
 			let { data, error, status } = await supabase
-				.from('projects')
-				.select(`id, created_at, name, description, status, user_id, billable, seq, hidden`);
-
+				.from('projects_by_most_recent')
+				.select(`
+					id, created_at, name, description, status, user_id, billable, seq, hidden, last_used, new
+				`)
+	
 			if (error && status !== 406) {
 				throw error;
 			}
-
+	
 			if (data) {
 				setProjects(data);
 			}
 		} catch (error) {
-			//alert("Error loading messages!");
 			console.log(error);
 		} finally {
-			setInitialProjectLoad(false);
 			setLoadingProjects(false);
 		}
 	}
+	
 
 	const [initialRefresh, setInitialRefresh] = useState(false);
 
@@ -272,17 +265,6 @@ export default function ProjectManager() {
 		getUser();
 	}, []);
 
-	const currentTime = new Date().getHours();
-	// format the time as Tuesday, July 16, 2019
-	const dateTimeString = new Date().toLocaleDateString('en-US', {
-		weekday: 'long',
-		year: 'numeric',
-		month: 'long',
-		day: 'numeric'
-	});
-	// format as HH:MM:SS
-	//const formattedLiveTime =
-	const userName = 'Brad';
 	const minSessionLength = config?.minSessionLength ?? 0.25;
 
 	const totalHours =
@@ -316,29 +298,8 @@ export default function ProjectManager() {
 			return acc;
 		}, 0) ?? 0;
 
-	/*{
-      id: 1,
-      project: 1,
-      startTime: new Date('7/16/2024 10:00:00'),
-      endTime: null
-    }*/
-
 	const currentProject = projects.find((project) => project.id === currentWorkSession?.project_id);
 	const workingOnString = currentProject ? `${currentProject.name}` : 'Start a new session!';
-
-	const projectLimitAmount = 5;
-	const filteredProjects = projects?.filter((project) => !project.hidden) ?? []; //project.hidden
-	const sortedProjects =
-		filteredProjects?.sort((a, b) => {
-			if (a.billable === b.billable) {
-				return (a.seq ?? 0) - (b.seq ?? 0);
-			}
-			return a.billable ? -1 : 1;
-		}) ?? [];
-
-	const projectsToShow = showAll || canEdit ? sortedProjects : sortedProjects.slice(0, projectLimitAmount);
-	//get a count of projects hidden
-	const hiddenProjectsCount = sortedProjects.length - projectsToShow.length;
 
 	return (
 		<Container>
@@ -379,8 +340,6 @@ export default function ProjectManager() {
 													Stop Session
 												</Button>
 											</Col>
-
-											{/* <Button color="danger">Pause</Button> */}
 										</Row>
 									) : (
 										<Row>
@@ -410,104 +369,6 @@ export default function ProjectManager() {
 
 			<hr></hr>
 			<Row>
-				{/*}
-				<Col xl="8">
-					<Row>
-						<Col>
-							<h3 className="mb-0">My Projects</h3>
-						</Col>
-						<Col>
-							<Button
-								style={{ float: 'right', width: '200px' }}
-								onClick={() => {
-									setCreateModal(true);
-								}}
-								color="primary"
-							>
-								<IconPlus /> Add Project
-							</Button>
-							<AddProjectModal isOpen={createModal} toggle={() => setCreateModal(!createModal)} user_id={user?.id} refreshData={getProjects} />
-							<EditProjectModal
-								isOpen={editModal}
-								toggle={() => setEditModal(!editModal)}
-								user_id={user?.id}
-								projectData={editingProject}
-								refreshData={refreshData}
-							/>
-						</Col>
-					</Row>
-					<Row>
-						<Col>
-							<p className="mt-0 mb-3 d-none d-sm-block" style={{ fontSize: '14px', color: 'grey' }}>
-								<strong>Work Orders and other tasks</strong>
-							</p>
-						</Col>
-						<Col>
-							<Button
-								style={{ float: 'right', width: '200px' }}
-								className="mt-1"
-								color={canEdit ? 'secondary' : 'clear'}
-								onClick={() => {
-									setCanEdit(!canEdit);
-								}}
-							>
-								{canEdit ? (
-									<>
-										<IconCheck /> Done Editing
-									</>
-								) : (
-									<>
-										<IconPencil /> Manage Projects
-									</>
-								)}
-							</Button>
-						</Col>
-					</Row>
-					
-					{loadingProjects && initialProjectLoad && (!projects || projects.length == 0) ? (
-						<>
-						<LoadingPlaceholder width='100%' height='45px' cornerRadius='5px' className='mt-2'/>
-						<LoadingPlaceholder width='100%' height='45px' cornerRadius='5px' className='mt-2' />
-						<LoadingPlaceholder width='100%' height='45px' cornerRadius='5px' className='mt-2'/>
-						<LoadingPlaceholder width='100%' height='45px' cornerRadius='5px' className='mt-2'/>
-						<LoadingPlaceholder width='100%' height='45px' cornerRadius='5px' className='mt-2'/>
-						</>
-
-					) : (
-						projectsToShow.map((project) => (
-							<ProjectCard
-								key={project.id}
-								currentWorkSession={currentWorkSession}
-								startWork={startWork}
-								project={project}
-								canEdit={canEdit}
-								setEditingProject={setEditingProject}
-								setEditModal={setEditModal}
-								refreshData={refreshData}
-							/>
-						))
-					)}
-					<Row>
-						<Col
-							//center the contents horizontally
-							className="d-flex justify-content-center"
-						>
-							<>
-								{!canEdit && !showAll && projects.length > projectLimitAmount && (
-									<Button color="secondary" style={{ width: '50%' }} outline onClick={() => setShowAll(true)} className="mt-3 mb-5">
-										Show More ({hiddenProjectsCount}) <IconCaretDown />
-									</Button>
-								)}
-								{!canEdit && showAll && (
-									<Button color="secondary" style={{ width: '50%' }} onClick={() => setShowAll(false)} className="mt-3  mb-5">
-										Show Less <IconCaretUp />
-									</Button>
-								)}
-							</>
-						</Col>
-					</Row>
-				</Col>
-				*/}
 				<Col>
 					<h3 className="mt-4 mt-xl-0 mb-0">Today's Work</h3>
 					<p className="mt-0 mb-4" style={{ fontSize: '14px', color: 'grey' }}>
