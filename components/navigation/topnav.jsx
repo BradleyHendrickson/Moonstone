@@ -12,14 +12,10 @@ export default async function TopNav() {
 
     const { data, error } = await supabase.auth.getUser()
 
-    console.log(data)
-
     var signedIn = false
     if (error || !data?.user) {
-        console.log("not signed in")
         signedIn = false 
     } else {
-        console.log("signed in")
         signedIn = true
     }
 
