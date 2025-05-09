@@ -48,6 +48,11 @@ export default function ClientSideNav({ signedIn }) {
                     Weekly Summary
                 </NavLink>
             </NavItem>
+            <NavItem className="d-none d-md-block">
+                <NavLink href="/weeklyplan/" active={activeRoute("/weeklyplan")}>
+                    Weekly Plan
+                </NavLink>
+            </NavItem>
             <NavItem >
                 <NavLink style={{ float: "right" }} href="/settings/" active={activeRoute("/settings")}>
                     Settings
@@ -76,6 +81,11 @@ export default function ClientSideNav({ signedIn }) {
             <NavItem>
                 <NavLink style={{ float: "right" }} href="/weeklysummary/" active={activeRoute("/weeklysummary")}>
                     Weekly Summary
+                </NavLink>
+            </NavItem>
+            <NavItem>
+                <NavLink style={{ float: "right" }} href="/weeklyplan/" active={activeRoute("/weeklyplan")}>
+                    Weekly Plan
                 </NavLink>
             </NavItem>
             <NavItem>

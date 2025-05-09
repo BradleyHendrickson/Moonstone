@@ -131,21 +131,10 @@ const UserSettings = () => {
 						/>
 					</FormGroup>
 					<FormGroup className="mt-2">
-						<Label for="kartayaEndpointClientID">Kartaya Endpoint Client ID</Label>
-						<Input
-							style={{ width: '40rem' }}
-							type="text"
-							name="kartayaEndpointClientID"
-							id="kartayaEndpointClientID"
-							value={config.kartayaEndpointClientID || ''}
-							onChange={handleConfigChange}
-						/>
-					</FormGroup>
-					<FormGroup className="mt-2">
 						<Label for="kartayaEndpointClientSecret">Kartaya Endpoint Client Secret</Label>
 						<Input
 							style={{ width: '40rem' }}
-							type="text"
+							type="password"
 							name="kartayaEndpointClientSecret"
 							id="kartayaEndpointClientSecret"
 							value={config.kartayaEndpointClientSecret || ''}
