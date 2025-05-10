@@ -1,57 +1,70 @@
-import React, { useEffect, useRef, forwardRef } from 'react';
+import React, { useEffect, useImperativeHandle, useRef, useState, forwardRef, memo } from 'react';
 import Select from 'react-select';
 
-const WOSelectEditor = forwardRef((props, ref) => {
-	const selectRef = useRef(null);
+const WOSelectEditor = memo(
+	forwardRef((props, ref) => {
+		const [selectedOption, setSelectedOption] = useState(null);
+		const [data, setData] = useState([]);
+		const selectRef = useRef(null);
 
-	// Expose focus method to parent via ref
-	React.useImperativeHandle(ref, () => ({
-		focus: () => {
-			if (selectRef.current) {
-				selectRef.current.focus();
+		useEffect(() => {
+			
+			console.log('props.values', props);
+			const initial = props.values?.find((opt) => opt.value === props.value);
+			setSelectedOption(initial || null);
+		}, [props.values, props.value]);
+
+		useEffect(() => {
+			setTimeout(() => {
+				if (selectRef.current) {
+					selectRef.current.focus();
+				}
+			});
+		}, []);
+
+		const handleChange = (option) => {
+			console.log('handleChange', option);
+
+			if (props.updateRow) {
+				props.updateRow({
+					...props.data,
+					[props.column.colId]: option.value
+				});
 			}
-		},
-	}));
-  
-	const options = props.options || [];
-	const value = options.find((opt) => opt.value === props.value) || null;
-  
-	const [selectedValue, setSelectedValue] = React.useState(value);
-  
-	useEffect(() => {
-	  setTimeout(() => {
-		if (selectRef.current) {
-		  selectRef.current.focus();
-		}
-	  });
-	}, []);
-  
-	const handleChange = (newValue) => {
-	  setSelectedValue(newValue);
-  
-	  // Update the value in the grid using setDataValue
-	  const newCellValue = newValue.value; // Only use the 'value' field to update
-	  //check type of newCellValue, it should be string
 
-	  props.node.setDataValue(props.colDef.field, newCellValue.toString());  // Update specific cell value
-  
-	  props.api.stopEditing(); // Stop editing after selection
-	};
-  
-	return (
-	  <div style={{ width: 300 }}>
-		<Select
-		  ref={selectRef}
-		  options={options}
-		  value={selectedValue}
-		  onChange={handleChange} // Ensure onChange triggers value update
-		  menuPortalTarget={document.body}
-		  menuPosition="absolute"
-		  menuPlacement="auto"
-		/>
-	  </div>
-	);
-  });
-  
+			setSelectedOption(option);
+			setTimeout(() => {
+				props.stopEditing();
+			});
+		};
+
+		useImperativeHandle(ref, () => ({
+			getValue: () => selectedOption?.value || null,
+			isCancelBeforeStart: () => false,
+			isCancelAfterEnd: () => false
+		}));
+
+		return (
+			<Select
+				key={`${props.value}-${props.values?.length}`}
+				inputRef={selectRef}
+				value={selectedOption}
+				onChange={handleChange}
+				options={props.values}
+				menuIsOpen={props.values?.length > 0}
+				autoFocus
+				styles={{
+					container: (base) => ({
+						...base,
+						width: '100%'
+					})
+				}}
+				menuPortalTarget={document.body}
+				menuPosition="absolute"
+				menuPlacement="auto"
+			/>
+		);
+	})
+);
 
 export default WOSelectEditor;
