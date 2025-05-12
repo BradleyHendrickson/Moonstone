@@ -82,7 +82,7 @@ const WeeklyPlanner = () => {
 		// Fetch planner data for the given week_of value
 		const { data: plannerData, error } = await supabase.from('planner').select('*').eq('week_of', weekOf);
 
-		console.log('fetching planner data for week:', weekOf);
+		//console.log('fetching planner data for week:', weekOf);
 
 		if (error) {
 			console.error('Supabase fetch error:', error.message);
@@ -182,6 +182,7 @@ const WeeklyPlanner = () => {
 	`;
 
 	const getvSMWorkOrder = async (endpoint) => {
+		console.log('Fetching work orders from endpoint:', endpoint);
 		const response = await fetch(endpoint, {
 			method: 'POST',
 			headers: {
@@ -294,7 +295,7 @@ const WeeklyPlanner = () => {
 					};
 				},
 				valueFormatter: (params) => {
-					console.log('params', params);
+					//console.log('params', params);
 					const wo = vSMWorkOrder.find((wo) => `${wo.WorkOrder}` === `${params?.data?.sm_wo}`);
 					const scope = wo?.linkedWorkOrderScopes.find((scope) => scope.Scope === params.value);
 					// if no work order, return the value
@@ -328,7 +329,7 @@ const WeeklyPlanner = () => {
 	};
 
 	const handleCellEdit = async (event) => {
-		console.log('Cell edited:', event);
+		//console.log('Cell edited:', event);
 		const { colDef, newValue, data } = event;
 		let updatedRow = { ...data };
 

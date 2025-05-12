@@ -23,7 +23,7 @@ const WOSelectEditor = memo(
 		}, []);
 
 		const handleChange = (option) => {
-			console.log('handleChange', option);
+			//console.log('handleChange', option);
 
 			if (props.updateRow) {
 				props.updateRow({

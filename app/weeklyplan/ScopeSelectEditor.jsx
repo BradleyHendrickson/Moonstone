@@ -9,7 +9,7 @@ const ScopeSelectEditor = memo(
 
         useEffect(() => {
             
-            console.log('props.values', props);
+            //console.log('props.values', props);
             const initial = props.values?.find((opt) => opt.value === props.value);
             setSelectedOption(initial || null);
         }, [props.values, props.value]);
@@ -23,7 +23,7 @@ const ScopeSelectEditor = memo(
         }, []);
 
         const handleChange = (option) => {
-            console.log('handleChange', option);
+           // console.log('handleChange', option);
 
             if (props.updateRow) {
                 props.updateRow({
