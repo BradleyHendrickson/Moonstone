@@ -4,7 +4,7 @@ import React, { useEffect, useRef, useState, useMemo, useCallback } from 'react'
 import { AgGridReact } from 'ag-grid-react';
 import { AllCommunityModule, ModuleRegistry } from 'ag-grid-community';
 import { createClient } from '@/utils/supabase/client';
-import { Button, FormGroup, Input, InputGroup } from 'reactstrap';
+import { Button, FormGroup, Input, InputGroup, Modal, ModalHeader, ModalBody, Row, Col, Collapse, Card, CardHeader, CardBody } from 'reactstrap';
 import WOSelectEditor from './WOSelectEditor';
 import UserSelectEditor from './UserSelectEditor';
 import WorkOrderDetailsModal from './WorkOrderDetailsModal';
@@ -25,6 +25,8 @@ const WeeklyPlanner = () => {
 	const [rowSaving, setRowSaving] = useState(false);
 	const [userList, setUserList] = useState([]);
 	const [include_closed, setIncludeClosed] = useState(false);
+	const [settingsOpen, setSettingsOpen] = useState(false);
+	const toggleSettings = () => setSettingsOpen(!settingsOpen);
 	const getMondayOfCurrentWeek = () => {
 		const today = new Date();
 		const day = today.getUTCDay(); // 0 (Sun) - 6 (Sat)
@@ -33,12 +35,11 @@ const WeeklyPlanner = () => {
 		monday.setUTCDate(today.getUTCDate() + diff);
 		return monday.toISOString().split('T')[0]; // Format as YYYY-MM-DD
 	};
-	
+
 	const [weekOf, setWeekOf] = useState(getMondayOfCurrentWeek());
-	
+
 	const toggleDetailsModal = () => setDetailsModalOpen(!detailsModalOpen);
 	const handleShowDetails = (row) => {
-
 		const wo = vSMWorkOrder.find((wo) => `${wo.WorkOrder}` === `${row.sm_wo}`);
 		if (wo) {
 			setSelectedDetails(wo);
@@ -75,15 +76,11 @@ const WeeklyPlanner = () => {
 		fetchToken();
 	}, []);
 
-
 	const fetchPlannerData = async () => {
 		if (!weekOf) return;
 
 		// Fetch planner data for the given week_of value
-		const { data: plannerData, error } = await supabase
-			.from('planner')
-			.select('*')
-			.eq('week_of', weekOf);
+		const { data: plannerData, error } = await supabase.from('planner').select('*').eq('week_of', weekOf);
 
 		console.log('fetching planner data for week:', weekOf);
 
@@ -115,7 +112,7 @@ const WeeklyPlanner = () => {
 						rate: laborRate,
 						planned_revenue: !atRisk ? row.plan_hours * laborRate : 0,
 						projected_revenue: !atRisk ? row.revised_hours * laborRate : 0,
-						at_risk: atRisk ? 'Yes' : 'No',
+						at_risk: atRisk ? 'Yes' : 'No'
 					};
 				});
 				setRowData(enriched);
@@ -143,16 +140,12 @@ const WeeklyPlanner = () => {
 			setUserList(userList);
 		};
 
-
-
-
-	
 		if (token && config) {
 			fetchUserList();
-			fetchPlannerData()
+			fetchPlannerData();
 		}
 	}, [token, config, weekOf]);
-	
+
 	const getWOGraphQLQuery = () => `
 		query {
 			vSMWorkOrder(where: {SMCo: {_eq: "1"}, ${include_closed ? 'WOStatus: {_in: [0, 1, 2]}' : 'WOStatus: {_eq: 0}'}}) {
@@ -215,59 +208,48 @@ const WeeklyPlanner = () => {
 
 	async function updateRow(row) {
 		if (!row) return;
-		
-		
+
 		setRowSaving(true); // start saving
-	
+
 		const supabase_columns = [
-			"id",
-			"week_of",
-			"sm_co",
-			"sm_wo",
-			"plan_hours",
-			"revised_hours",
-			"user_id",
-			"override_dev",
-			"override_rate",
-			"override_at_risk",
-			"scope",
-			"planner_user"
+			'id',
+			'week_of',
+			'sm_co',
+			'sm_wo',
+			'plan_hours',
+			'revised_hours',
+			'user_id',
+			'override_dev',
+			'override_rate',
+			'override_at_risk',
+			'scope',
+			'planner_user'
 		];
-	
+
 		const updatedRow = { ...row };
 
 		if (updatedRow.id) {
-
 			// Filter to only allowed columns
-			const filteredUpdate = Object.fromEntries(
-				Object.entries(updatedRow).filter(([key]) => supabase_columns.includes(key))
-			);
-	
+			const filteredUpdate = Object.fromEntries(Object.entries(updatedRow).filter(([key]) => supabase_columns.includes(key)));
+
 			if (updatedRow.scope) {
 				updatedRow.scope = parseInt(updatedRow.scope, 10);
 			}
 
-			const { error } = await supabase
-				.from('planner')
-				.update(filteredUpdate)
-				.eq('id', updatedRow.id);
-	
+			const { error } = await supabase.from('planner').update(filteredUpdate).eq('id', updatedRow.id);
+
 			if (error) console.error('Supabase update error:', error.message);
-	
-			setRowData((prevData) =>
-				prevData.map((r) => (r.id === updatedRow.id ? { ...r, ...updatedRow } : r))
-			);
+
+			setRowData((prevData) => prevData.map((r) => (r.id === updatedRow.id ? { ...r, ...updatedRow } : r)));
 		}
-	
+
 		setRowSaving(false); // done saving
 	}
-	
-	
 
 	const calculatedColumnStyle = {
 		backgroundColor: '#f0f0f0',
-		color: '#333333',
-	}
+		color: '#333333'
+	};
 	const colDefs = useMemo(() => {
 		return [
 			{
@@ -299,7 +281,10 @@ const WeeklyPlanner = () => {
 					return wo ? `${wo.WorkOrder} - ${wo.Description}` : params.value;
 				}
 			},
-			{ field: 'scope', headerName: 'Scope', editable: true,
+			{
+				field: 'scope',
+				headerName: 'Scope',
+				editable: true,
 				cellEditor: 'agSelectCellEditor',
 				cellEditorParams: (params) => {
 					const wo = vSMWorkOrder.find((wo) => `${wo.WorkOrder}` === `${params.data.sm_wo}`);
@@ -316,7 +301,7 @@ const WeeklyPlanner = () => {
 					if (!wo) return params.value;
 					return scope ? `${scope.Scope} - ${scope.Description}` : params.value;
 				}
-			 },
+			},
 			{
 				field: 'details',
 				headerName: 'Details',
@@ -326,17 +311,12 @@ const WeeklyPlanner = () => {
 					onShowDetails: handleShowDetails
 				}
 			},
-			{ field: 'at_risk', headerName: 'At Risk', editable: false
-			 },
-			{ field: 'plan_hours', headerName: 'Plan Hours', editable: true, cellClass: 'ag-right-aligned-cell'
-			 },
+			{ field: 'at_risk', headerName: 'At Risk', editable: false },
+			{ field: 'plan_hours', headerName: 'Plan Hours', editable: true, cellClass: 'ag-right-aligned-cell' },
 			{ field: 'revised_hours', headerName: 'Revised Hours', editable: true, cellClass: 'ag-right-aligned-cell' },
-			{ field: 'rate', headerName: 'Rate', editable: false, cellClass: 'ag-right-aligned-cell'
-			 },
-			{ field: 'planned_revenue', headerName: 'Planned Revenue', editable: false, cellClass: 'ag-right-aligned-cell'
-			 },
-			{ field: 'projected_revenue', headerName: 'Projected Revenue', editable: false, cellClass: 'ag-right-aligned-cell'
-			 }
+			{ field: 'rate', headerName: 'Rate', editable: false, cellClass: 'ag-right-aligned-cell' },
+			{ field: 'planned_revenue', headerName: 'Planned Revenue', editable: false, cellClass: 'ag-right-aligned-cell' },
+			{ field: 'projected_revenue', headerName: 'Projected Revenue', editable: false, cellClass: 'ag-right-aligned-cell' }
 		];
 	}, [workOrderOptions]);
 
@@ -351,7 +331,7 @@ const WeeklyPlanner = () => {
 		console.log('Cell edited:', event);
 		const { colDef, newValue, data } = event;
 		let updatedRow = { ...data };
-	
+
 		if (colDef.field === 'sm_wo') {
 			const match = vSMWorkOrder.find((wo) => wo.WorkOrder === newValue);
 			if (match) {
@@ -362,48 +342,39 @@ const WeeklyPlanner = () => {
 
 		if (updatedRow.id) {
 			setRowSaving(true); // Start saving indicator
-	
 
-			
 			const supabase_columns = [
-				"id",
-				"week_of",
-				"sm_co",
-				"sm_wo",
-				"plan_hours",
-				"revised_hours",
-				"user_id",
-				"override_dev",
-				"override_rate",
-				"override_at_risk",
-				"scope",
-				"planner_user"
+				'id',
+				'week_of',
+				'sm_co',
+				'sm_wo',
+				'plan_hours',
+				'revised_hours',
+				'user_id',
+				'override_dev',
+				'override_rate',
+				'override_at_risk',
+				'scope',
+				'planner_user'
 			];
-	
+
 			// cast scope to int
 			if (updatedRow.scope) {
 				updatedRow.scope = parseInt(updatedRow.scope, 10);
 			}
 
-			
+			const filteredUpdate = Object.fromEntries(Object.entries(updatedRow).filter(([key]) => supabase_columns.includes(key)));
 
-			const filteredUpdate = Object.fromEntries(
-				Object.entries(updatedRow).filter(([key]) => supabase_columns.includes(key))
-			);
-	
 			try {
-				const { error } = await supabase
-					.from('planner')
-					.update(filteredUpdate)
-					.eq('id', updatedRow.id);
-	
+				const { error } = await supabase.from('planner').update(filteredUpdate).eq('id', updatedRow.id);
+
 				if (error) console.error('Supabase update error:', error.message);
 			} catch (err) {
 				console.error('Unexpected update error:', err);
 			} finally {
 				setRowSaving(false); // Done saving
 			}
-	
+
 			// calculate at_risk, planned_revenue, projected_revenue and set it on updatedRow
 			const workOrder = vSMWorkOrder.find((wo) => `${wo.WorkOrder}` === `${updatedRow.sm_wo}`);
 			const matchingScope = workOrder?.linkedWorkOrderScopes?.find((scope) => scope.Scope === updatedRow.scope);
@@ -416,14 +387,9 @@ const WeeklyPlanner = () => {
 			updatedRow.planned_revenue = !atRisk ? updatedRow.plan_hours * laborRate : 0;
 			updatedRow.projected_revenue = !atRisk ? updatedRow.revised_hours * laborRate : 0;
 
-			setRowData((prevData) =>
-				prevData.map((row) =>
-					row.id === updatedRow.id ? { ...row, ...updatedRow } : row
-				)
-			);
+			setRowData((prevData) => prevData.map((row) => (row.id === updatedRow.id ? { ...row, ...updatedRow } : row)));
 		}
 	};
-	
 
 	const handleAddRow = async () => {
 		const newRow = {
@@ -462,89 +428,75 @@ const WeeklyPlanner = () => {
 		//plan_hours: //rowData.reduce((sum, r) => sum + (r.plan_hours || 0), 0),
 		//revised_hours: rowData.reduce((sum, r) => sum + (r.revised_hours || 0), 0),
 		planned_revenue: rowData.reduce((sum, r) => sum + (r.planned_revenue || 0), 0),
-		projected_revenue: rowData.reduce((sum, r) => sum + (r.projected_revenue || 0), 0),
+		projected_revenue: rowData.reduce((sum, r) => sum + (r.projected_revenue || 0), 0)
 		//at_risk: '' // optional: leave blank or summarize
 	};
 
 	return (
-		<div>
-			<div>
-				{
-					rowSaving ? (
-						<div>
-							Saving changes...
-						</div>
-					) : (
-						<div>
-							Up to date.
-						</div>
-					)
-				}
+		<div style={{ display: 'flex', flexDirection: 'column', height: '90vh' }}>
+			<Row className="mb-3 p-3">
+				<Col xs="auto">
+					<span className="fw-bold me-2">Week of:</span>
+					<input type="date" value={weekOf} onChange={(e) => setWeekOf(e.target.value)} />
+				</Col>
+				<Col>
+					<FormGroup check inline className="mb-0">
+						<Input
+							type="checkbox"
+							id="include_closed"
+							checked={include_closed}
+							onChange={(e) => setIncludeClosed(e.target.checked)}
+							className="me-1"
+						/>
+						<label htmlFor="include_closed" className="form-check-label">
+							Include Closed
+						</label>
+					</FormGroup>
+				</Col>
+			</Row>
+	
+			<Row className="align-items-center mb-3 p-2">
+				<Col>
+					<h3 className="mb-0">
+						{weekOf ? `Weekly Planner for ${new Date(weekOf).toLocaleDateString(undefined, { timeZone: 'UTC' })}` : 'Weekly Planner'}
+					</h3>
+					<div>{rowSaving ? <div className="mt-0 mb-2">Saving changes...</div> : <div>Up to date.</div>}</div>
+				</Col>
+				<Col className="d-flex justify-content-end align-items-center">
+					<Button color="primary" onClick={handleAddRow} className="me-2">
+						Add Row
+					</Button>
+					<Button onClick={handleDeleteRow} className="me-3">
+						Delete Selected
+					</Button>
+				</Col>
+			</Row>
+	
+			<div style={{ flex: 1, padding: '0 10px' }}>
+				<div className="ag-theme-balham" style={{ height: '100%', width: '100%' }}>
+					<AgGridReact
+						ref={gridRef}
+						rowData={rowData}
+						columnDefs={colDefs}
+						defaultColDef={defaultColDef}
+						theme={themeAlpine}
+						spacing={'2px'}
+						rowSelection="multiple"
+						components={{
+							WOSelectEditor,
+							UserSelectEditor,
+							detailsButtonRenderer: DetailsButtonRenderer
+						}}
+						onCellValueChanged={handleCellEdit}
+						pinnedBottomRowData={[totalRow]}
+					/>
+				</div>
 			</div>
-			<div className="p-3">
-				<Button color="primary" onClick={handleAddRow}>
-					Add Row
-				</Button>
-				<Button onClick={handleDeleteRow} style={{ marginLeft: 10 }}>
-					Delete Selected
-				</Button>
-				<Button onClick={fetchPlannerData} style={{ marginLeft: 10 }}>
-					Refresh
-				</Button>
-				<FormGroup check inline style={{ marginLeft: 10 }}>
-					<Input type="checkbox" id="include_closed" checked={include_closed} onChange={(e) => setIncludeClosed(e.target.checked)} />
-					<label htmlFor="include_closed">Include Closed</label>
-				</FormGroup>
-			</div>
-			<div
-				style={{
-					flex: 'none',
-					display: 'flex',
-					gap: '8px',
-					alignItems: 'center'
-				}}
-			>
-				spacing ={' '}
-				<span style={{ minWidth: '50px' }}>
-					<span id="spacing">8.0</span>px
-				</span>
-				<input
-					type="range"
-					onInput={() => changeSize(event.target.valueAsNumber)}
-					defaultValue="8"
-					min="0"
-					max="20"
-					step="0.1"
-					style={{ width: '200px' }}
-				/>
-			</div>
-			<div className="p-3">
-				Week of: <input type="date" value={weekOf} onChange={(e) => setWeekOf(e.target.value)} />
-			</div>
-
-			<h3>{weekOf ? `Weekly Planner for ${new Date(weekOf).toLocaleDateString(undefined, { timeZone: 'UTC' })}` : 'Weekly Planner'}</h3>
-			<div className="ag-theme-balham" style={{ height: 600, width: '100%', padding: '0 10px' }}>
-				<AgGridReact
-					ref={gridRef}
-					rowData={rowData}
-					columnDefs={colDefs}
-					defaultColDef={defaultColDef}
-					theme={themeAlpine}
-					spacing={'2px'}
-					rowSelection="multiple"
-					components={{
-						WOSelectEditor,
-						UserSelectEditor,
-						detailsButtonRenderer: DetailsButtonRenderer
-					}}
-					onCellValueChanged={handleCellEdit}
-					pinnedBottomRowData={[totalRow]}
-				/>
-			</div>
-			<pre>{JSON.stringify(rowData, null, 2)}</pre>
+	
 			<WorkOrderDetailsModal isOpen={detailsModalOpen} toggle={toggleDetailsModal} data={selectedDetails} />
 		</div>
 	);
+	
 };
 
 export default WeeklyPlanner;
