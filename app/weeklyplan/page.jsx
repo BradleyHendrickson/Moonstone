@@ -28,6 +28,15 @@ const WeeklyPlanner = () => {
 	const [include_closed, setIncludeClosed] = useState(false);
 	const [settingsOpen, setSettingsOpen] = useState(false);
 	const toggleSettings = () => setSettingsOpen(!settingsOpen);
+	const [spacing, setSpacing] = useState(() => {
+		const saved = localStorage.getItem('planner_spacing');
+		return saved !== null ? parseInt(saved, 10) : 10; // Default spacing is 10
+	});
+
+	useEffect(() => {
+		localStorage.setItem('planner_spacing', spacing.toString());
+	}, [spacing]);
+
 	const getMondayOfCurrentWeek = () => {
 		const today = new Date();
 		const day = today.getUTCDay(); // 0 (Sun) - 6 (Sat)
@@ -312,7 +321,7 @@ const WeeklyPlanner = () => {
 				cellRendererParams: {
 					onShowDetails: handleShowDetails
 				},
-				flex: 0.5	,
+				flex: 0.5
 			},
 			{ field: 'at_risk', headerName: 'At Risk', editable: false, flex: 0.6 },
 			{ field: 'plan_hours', headerName: 'Plan Hours', editable: true, cellClass: 'ag-right-aligned-cell', flex: 0.85 },
@@ -456,8 +465,15 @@ const WeeklyPlanner = () => {
 						</label>
 					</FormGroup>
 				</Col>
+				<Col>
+					<FormGroup>
+						<label htmlFor="spacing-slider">Spacing</label>
+						<Input type="range" id="spacing-slider" min={0} max={100} value={spacing} onChange={(e) => setSpacing(parseInt(e.target.value, 10))} />
+						<div>{spacing/10}px</div>
+					</FormGroup>
+				</Col>
 			</Row>
-	
+
 			<Row className="align-items-center mb-3 p-2">
 				<Col>
 					<h3 className="mb-0">
@@ -474,9 +490,16 @@ const WeeklyPlanner = () => {
 					</Button>
 				</Col>
 			</Row>
-	
+
 			<div style={{ flex: 1, padding: '0 10px' }}>
-				<div className="ag-theme-balham" style={{ height: '100%', width: '100%' }}>
+				<div
+					className="ag-theme-balham"
+					style={{
+						height: '100%',
+						width: '100%',
+						'--ag-spacing': `${spacing/10}px`
+					}}
+				>
 					<AgGridReact
 						ref={gridRef}
 						rowData={rowData}
@@ -495,11 +518,10 @@ const WeeklyPlanner = () => {
 					/>
 				</div>
 			</div>
-	
+
 			<WorkOrderDetailsModal isOpen={detailsModalOpen} toggle={toggleDetailsModal} data={selectedDetails} />
 		</div>
 	);
-	
 };
 
 export default WeeklyPlanner;
