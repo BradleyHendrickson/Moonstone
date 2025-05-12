@@ -26,7 +26,7 @@ export async function GET() {
     // Create a simple payload — adjust fields as needed
     const payload = {
       sub: 'api-client',
-      iat: Math.floor(Date.now() / 1000) - 30,
+      iat: Math.floor(Date.now() / 1000) - 60,
       "https://hasura.io/jwt/claims": {
         "x-hasura-allowed-roles": ["user", "admin"],
         "x-hasura-default-role": "user",
