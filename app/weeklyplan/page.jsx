@@ -10,6 +10,7 @@ import UserSelectEditor from './UserSelectEditor';
 import WorkOrderDetailsModal from './WorkOrderDetailsModal';
 import DetailsButtonRenderer from './DetailsButtonRenderer';
 import { themeAlpine } from 'ag-grid-community';
+
 ModuleRegistry.registerModules([AllCommunityModule]);
 
 const WeeklyPlanner = () => {
@@ -310,12 +311,13 @@ const WeeklyPlanner = () => {
 				cellRenderer: 'detailsButtonRenderer',
 				cellRendererParams: {
 					onShowDetails: handleShowDetails
-				}
+				},
+				flex: 0.5	,
 			},
-			{ field: 'at_risk', headerName: 'At Risk', editable: false },
-			{ field: 'plan_hours', headerName: 'Plan Hours', editable: true, cellClass: 'ag-right-aligned-cell' },
-			{ field: 'revised_hours', headerName: 'Revised Hours', editable: true, cellClass: 'ag-right-aligned-cell' },
-			{ field: 'rate', headerName: 'Rate', editable: false, cellClass: 'ag-right-aligned-cell' },
+			{ field: 'at_risk', headerName: 'At Risk', editable: false, flex: 0.6 },
+			{ field: 'plan_hours', headerName: 'Plan Hours', editable: true, cellClass: 'ag-right-aligned-cell', flex: 0.85 },
+			{ field: 'revised_hours', headerName: 'Revised Hours', editable: true, cellClass: 'ag-right-aligned-cell', flex: 0.85 },
+			{ field: 'rate', headerName: 'Rate', editable: false, cellClass: 'ag-right-aligned-cell', flex: 0.5 },
 			{ field: 'planned_revenue', headerName: 'Planned Revenue', editable: false, cellClass: 'ag-right-aligned-cell' },
 			{ field: 'projected_revenue', headerName: 'Projected Revenue', editable: false, cellClass: 'ag-right-aligned-cell' }
 		];

@@ -1,4 +1,6 @@
 import React from 'react'
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import { faEllipsisVertical} from '@fortawesome/free-solid-svg-icons'
 
 const DetailsButtonRenderer = (props) => {
 	const handleClick = (e) => {
@@ -7,9 +9,10 @@ const DetailsButtonRenderer = (props) => {
 	}
 	if (props.node.rowPinned) return null; // Don't render in summary row
 	return (
-		<a href="#" onClick={handleClick}>
-			View Details
+		<a href="#" onClick={handleClick} style={{ textDecoration: 'none', color: 'black' }}>
+			<FontAwesomeIcon icon={faEllipsisVertical} size="lg" color="black" />
 		</a>
+		
 	)
 }
 

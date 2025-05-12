@@ -6,6 +6,9 @@
     "start": "next start"
   },
   "dependencies": {
+    "@fortawesome/fontawesome-svg-core": "^6.7.2",
+    "@fortawesome/free-solid-svg-icons": "^6.7.2",
+    "@fortawesome/react-fontawesome": "^0.2.2",
     "@supabase/ssr": "^0.6.1",
     "@supabase/supabase-js": "latest",
     "@tabler/icons-react": "^3.9.0",
