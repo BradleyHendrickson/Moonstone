@@ -9,7 +9,6 @@ const WOSelectEditor = memo(
 
 		useEffect(() => {
 			
-
 			const initial = props.values?.find((opt) => opt.value === props.value);
 			setSelectedOption(initial || null);
 		}, [props.values, props.value]);
