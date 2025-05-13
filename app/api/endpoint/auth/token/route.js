@@ -26,7 +26,7 @@ export async function GET() {
     // Create a simple payload — adjust fields as needed
     const payload = {
       sub: 'api-client',
-      iat: Math.floor(Date.now() / 1000) - 60,
+      iat: Math.floor(Date.now() / 1000) - 80,
       "https://hasura.io/jwt/claims": {
         "x-hasura-allowed-roles": ["user", "admin"],
         "x-hasura-default-role": "user",
@@ -34,7 +34,7 @@ export async function GET() {
       }
     };
 
-    const token = jwt.sign(payload, endpoint_secret, { algorithm: 'HS256',expiresIn: '1h' });
+    const token = jwt.sign(payload, endpoint_secret, { algorithm: 'HS256',expiresIn: '2h' });
 
     return NextResponse.json({ token, endpoint_url });
   } catch (err) {
