@@ -130,15 +130,15 @@ const WorkOrderDetailsModal = ({ isOpen, toggle, data, defaultExpandedScope }) =
           );
         })}
 
-        <div className="mt-4">
-          <h5>Summary</h5>
+        <div className="mt-4 mb-5">
+          
           <Row>
-			<Col md="8"></Col>
+			<Col md="8"><h5>Summary</h5></Col>
             <Col md="2"><strong>Planned:</strong> {totalPlannedHours.toFixed(2)}</Col>
             <Col md="2"><strong>Actual:</strong> {totalActualHours.toFixed(2)}</Col>
           </Row>
         </div>
-		<pre>{JSON.stringify(data, null, 2)}</pre>
+		{/*<pre>{JSON.stringify(data, null, 2)}</pre>*/}
       </ModalBody>
     </Modal>
   );

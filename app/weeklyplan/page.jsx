@@ -14,6 +14,7 @@ import WeekPickerModal from './WeekPickerModal';
 import WeekPlannerSettingsModal from './WeekPlannerSettingsModal';
 import { faGear } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import PlannerSummaryTable from './PlannerSummaryTable';
 
 ModuleRegistry.registerModules([AllCommunityModule]);
 
@@ -31,7 +32,11 @@ const WeeklyPlanner = () => {
 	const [userList, setUserList] = useState([]);
 	const [include_closed, setIncludeClosed] = useState(false);
 	const [settingsOpen, setSettingsOpen] = useState(false);
+	const [techSummaryOpen, setTechSummaryOpen] = useState(false);
+
+
 	const toggleSettings = () => setSettingsOpen(!settingsOpen);
+	const toggleTechSummary = () => setTechSummaryOpen(!techSummaryOpen);
 	const [spacing, setSpacing] = useState(() => {
 		const saved = localStorage.getItem('planner_spacing');
 		return saved !== null ? parseInt(saved, 10) : 10; // Default spacing is 10
@@ -449,76 +454,83 @@ const WeeklyPlanner = () => {
 	};
 
 	return (
-		<div style={{ display: 'flex', flexDirection: 'column', height: '90vh' }}>
-			<Row className="mb-2 px-3">
-				<Col className="d-flex justify-content-between align-items-center">
-					<div></div>
-					<WeekPlannerSettingsModal isOpen={settingsOpen} toggle={toggleSettings} spacing={spacing} setSpacing={setSpacing} />
-				</Col>
-			</Row>
+		<>
+			<div style={{ display: 'flex', flexDirection: 'column', height: '90vh' }}>
+				<Row className="mb-2 px-3">
+					<Col className="d-flex justify-content-between align-items-center">
+						<div></div>
+						<WeekPlannerSettingsModal isOpen={settingsOpen} toggle={toggleSettings} spacing={spacing} setSpacing={setSpacing} />
+					</Col>
+				</Row>
 
-			<Row className="mb-1 mt-4">
-				<Col xs={12} className="text-center">
-					<h3 className="mb-0">
-						{weekOf ? `Weekly Planner for ${new Date(weekOf).toLocaleDateString(undefined, { timeZone: 'UTC' })}` : 'Weekly Planner'}
-					</h3>
-				</Col>
-			</Row>
+				<Row className="mb-1 mt-4">
+					<Col xs={12} className="text-center">
+						<h3 className="mb-0">
+							{weekOf ? `Weekly Planner for ${new Date(weekOf).toLocaleDateString(undefined, { timeZone: 'UTC' })}` : 'Weekly Planner'}
+						</h3>
+					</Col>
+				</Row>
 
-			<Row className="mb-1">
-				<Col xs={12} className="d-flex justify-content-center">
-					<WeekPickerModal weekOf={weekOf} setWeekOf={setWeekOf} />
-				</Col>
-			</Row>
+				<Row className="mb-1">
+					<Col xs={12} className="d-flex justify-content-center">
+						<WeekPickerModal weekOf={weekOf} setWeekOf={setWeekOf} />
+					</Col>
+				</Row>
 
-			<Row className="mb-3">
-				<Col xs={12} className="text-center">
-					{rowSaving ? <div className="mt-0 mb-2">Saving changes...</div> : <div>Up to date.</div>}
-				</Col>
-			</Row>
+				<Row className="mb-3">
+					<Col xs={12} className="text-center">
+						{rowSaving ? <div className="mt-0 mb-2">Saving changes...</div> : <div>Up to date.</div>}
+					</Col>
+				</Row>
 
-			<Row className="mb-3 px-3">
-				<Col className="d-flex justify-content-end">
-				<Button color="link" onClick={toggleSettings} className="me-2">
-						<FontAwesomeIcon icon={faGear} size="lg" color="black" /> Settings
-					</Button>
-					<Button color="primary" onClick={handleAddRow} className="me-2">
-						Add Row
-					</Button>
-					<Button onClick={handleDeleteRow}>Delete Selected</Button>
-				</Col>
-			</Row>
+				<Row className="mb-3 px-3">
+					<Col className="d-flex justify-content-end">
+						<Button color="link" onClick={toggleSettings} className="me-2">
+							<FontAwesomeIcon icon={faGear} size="lg" color="black" /> Settings
+						</Button>
+						<Button color="primary" onClick={handleAddRow} className="me-2">
+							Add Row
+						</Button>
+						<Button onClick={handleDeleteRow}>Delete Selected</Button>
+						<PlannerSummaryTable rowData={rowData} userList={userList} weekOf={ weekOf} />
+					</Col>
+				</Row>
 
-			<div style={{ flex: 1, padding: '0 10px' }}>
-				<div
-					className="ag-theme-balham"
-					style={{
-						height: '100%',
-						width: '100%',
-						'--ag-spacing': `${spacing / 10}px`
-					}}
-				>
-					<AgGridReact
-						ref={gridRef}
-						rowData={rowData}
-						columnDefs={colDefs}
-						defaultColDef={defaultColDef}
-						theme={themeAlpine}
-						spacing={'2px'}
-						rowSelection="multiple"
-						components={{
-							WOSelectEditor,
-							UserSelectEditor,
-							detailsButtonRenderer: DetailsButtonRenderer
+				<div style={{ flex: 1, padding: '0 10px' }}>
+					<div
+						className="ag-theme-balham"
+						style={{
+							height: '100%',
+							width: '100%',
+							'--ag-spacing': `${spacing / 10}px`
 						}}
-						onCellValueChanged={handleCellEdit}
-						pinnedBottomRowData={[totalRow]}
-					/>
+					>
+						<AgGridReact
+							ref={gridRef}
+							rowData={rowData}
+							columnDefs={colDefs}
+							defaultColDef={defaultColDef}
+							theme={themeAlpine}
+							spacing={'2px'}
+							rowSelection="multiple"
+							components={{
+								WOSelectEditor,
+								UserSelectEditor,
+								detailsButtonRenderer: DetailsButtonRenderer
+							}}
+							onCellValueChanged={handleCellEdit}
+							pinnedBottomRowData={[totalRow]}
+						/>
+					</div>
 				</div>
-			</div>
 
-			<WorkOrderDetailsModal isOpen={detailsModalOpen} toggle={toggleDetailsModal} data={selectedDetails} />
-		</div>
+				<WorkOrderDetailsModal isOpen={detailsModalOpen} toggle={toggleDetailsModal} data={selectedDetails} />
+			</div>
+			
+			
+
+			<pre>{JSON.stringify(rowData, null, 2)}</pre>
+		</>
 	);
 };
 

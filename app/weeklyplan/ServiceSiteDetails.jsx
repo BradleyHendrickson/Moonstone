@@ -16,12 +16,7 @@ const ServiceSiteDetails = ({ linkedServiceSite }) => {
 			{linkedRateTemplate && (
 				<Row>
 					<Col>
-						<p>{linkedRateTemplate.Description}</p>
-					</Col>
-					<Col>
-						<p>
-							<strong>Labor Rate:</strong> ${linkedRateTemplate.LaborRate.toFixed(2)}
-						</p>
+						<p>{linkedRateTemplate.Description} - <strong>Labor Rate:</strong> ${linkedRateTemplate.LaborRate.toFixed(2)}/hr</p>
 					</Col>
 				</Row>
 			)}
