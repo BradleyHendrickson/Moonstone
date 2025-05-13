@@ -527,9 +527,6 @@ const WeeklyPlanner = () => {
 				<WorkOrderDetailsModal isOpen={detailsModalOpen} toggle={toggleDetailsModal} data={selectedDetails} />
 			</div>
 			
-			
-
-			<pre>{JSON.stringify(rowData, null, 2)}</pre>
 		</>
 	);
 };
