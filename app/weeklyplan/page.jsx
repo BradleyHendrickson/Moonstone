@@ -10,6 +10,10 @@ import UserSelectEditor from './UserSelectEditor';
 import WorkOrderDetailsModal from './WorkOrderDetailsModal';
 import DetailsButtonRenderer from './DetailsButtonRenderer';
 import { themeAlpine } from 'ag-grid-community';
+import WeekPickerModal from './WeekPickerModal';
+import WeekPlannerSettingsModal from './WeekPlannerSettingsModal';
+import { faGear } from '@fortawesome/free-solid-svg-icons';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
 ModuleRegistry.registerModules([AllCommunityModule]);
 
@@ -446,48 +450,42 @@ const WeeklyPlanner = () => {
 
 	return (
 		<div style={{ display: 'flex', flexDirection: 'column', height: '90vh' }}>
-			<Row className="mb-3 p-3">
-				<Col xs="auto">
-					<span className="fw-bold me-2">Week of:</span>
-					<input type="date" value={weekOf} onChange={(e) => setWeekOf(e.target.value)} />
-				</Col>
-				<Col>
-					<FormGroup check inline className="mb-0">
-						<Input
-							type="checkbox"
-							id="include_closed"
-							checked={include_closed}
-							onChange={(e) => setIncludeClosed(e.target.checked)}
-							className="me-1"
-						/>
-						<label htmlFor="include_closed" className="form-check-label">
-							Include Closed
-						</label>
-					</FormGroup>
-				</Col>
-				<Col>
-					<FormGroup>
-						<label htmlFor="spacing-slider">Spacing</label>
-						<Input type="range" id="spacing-slider" min={0} max={100} value={spacing} onChange={(e) => setSpacing(parseInt(e.target.value, 10))} />
-						<div>{spacing/10}px</div>
-					</FormGroup>
+			<Row className="mb-2 px-3">
+				<Col className="d-flex justify-content-between align-items-center">
+					<div></div>
+					<WeekPlannerSettingsModal isOpen={settingsOpen} toggle={toggleSettings} spacing={spacing} setSpacing={setSpacing} />
 				</Col>
 			</Row>
 
-			<Row className="align-items-center mb-3 p-2">
-				<Col>
+			<Row className="mb-1 mt-4">
+				<Col xs={12} className="text-center">
 					<h3 className="mb-0">
 						{weekOf ? `Weekly Planner for ${new Date(weekOf).toLocaleDateString(undefined, { timeZone: 'UTC' })}` : 'Weekly Planner'}
 					</h3>
-					<div>{rowSaving ? <div className="mt-0 mb-2">Saving changes...</div> : <div>Up to date.</div>}</div>
 				</Col>
-				<Col className="d-flex justify-content-end align-items-center">
+			</Row>
+
+			<Row className="mb-1">
+				<Col xs={12} className="d-flex justify-content-center">
+					<WeekPickerModal weekOf={weekOf} setWeekOf={setWeekOf} />
+				</Col>
+			</Row>
+
+			<Row className="mb-3">
+				<Col xs={12} className="text-center">
+					{rowSaving ? <div className="mt-0 mb-2">Saving changes...</div> : <div>Up to date.</div>}
+				</Col>
+			</Row>
+
+			<Row className="mb-3 px-3">
+				<Col className="d-flex justify-content-end">
+				<Button color="link" onClick={toggleSettings} className="me-2">
+						<FontAwesomeIcon icon={faGear} size="lg" color="black" /> Settings
+					</Button>
 					<Button color="primary" onClick={handleAddRow} className="me-2">
 						Add Row
 					</Button>
-					<Button onClick={handleDeleteRow} className="me-3">
-						Delete Selected
-					</Button>
+					<Button onClick={handleDeleteRow}>Delete Selected</Button>
 				</Col>
 			</Row>
 
@@ -497,7 +495,7 @@ const WeeklyPlanner = () => {
 					style={{
 						height: '100%',
 						width: '100%',
-						'--ag-spacing': `${spacing/10}px`
+						'--ag-spacing': `${spacing / 10}px`
 					}}
 				>
 					<AgGridReact
