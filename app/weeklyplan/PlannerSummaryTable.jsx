@@ -1,8 +1,6 @@
 import React, { useState } from 'react';
 import { Modal, ModalHeader, ModalBody, Button } from 'reactstrap';
 import { AgGridReact } from 'ag-grid-react';
-import 'ag-grid-community/styles/ag-grid.css';
-import 'ag-grid-community/styles/ag-theme-alpine.css';
 
 const PlannerSummaryTable = ({ rowData, userList, weekOf }) => {
   const [modalOpen, setModalOpen] = useState(false);
