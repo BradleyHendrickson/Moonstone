@@ -15,6 +15,7 @@ import WeekPlannerSettingsModal from './WeekPlannerSettingsModal';
 import { faGear } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import PlannerSummaryTable from './PlannerSummaryTable';
+import jwtDecode from 'jwt-decode';
 
 ModuleRegistry.registerModules([AllCommunityModule]);
 
@@ -42,40 +43,25 @@ const WeeklyPlanner = () => {
 		return saved !== null ? parseInt(saved, 10) : 10; // Default spacing is 10
 	});
 
-	useEffect(() => {
-		localStorage.setItem('planner_spacing', spacing.toString());
-	}, [spacing]);
-
-	const getMondayOfCurrentWeek = () => {
-		const today = new Date();
-		const day = today.getUTCDay(); // 0 (Sun) - 6 (Sat)
-		const diff = day === 0 ? -6 : 1 - day; // if Sunday, backtrack 6 days; otherwise subtract (day - 1)
-		const monday = new Date(today);
-		monday.setUTCDate(today.getUTCDate() + diff);
-		return monday.toISOString().split('T')[0]; // Format as YYYY-MM-DD
-	};
-
-	const [weekOf, setWeekOf] = useState(getMondayOfCurrentWeek());
-
-	const toggleDetailsModal = () => setDetailsModalOpen(!detailsModalOpen);
-	const handleShowDetails = (row) => {
-		const wo = vSMWorkOrder.find((wo) => `${wo.WorkOrder}` === `${row.sm_wo}`);
-		if (wo) {
-			setSelectedDetails(wo);
-			setDetailsModalOpen(true);
+	const decodeTokenExpiry = (token) => {
+		try {
+			const decoded = jwtDecode(token);
+			return decoded.exp;
+		} catch {
+			return null;
 		}
 	};
-	// Load user and config
+
 	useEffect(() => {
 		const loadUser = async () => {
 			const {
 				data: { user }
 			} = await supabase.auth.getUser();
 			setUser(user);
-
+	
 			if (user) {
 				const { data, error } = await supabase.from('usersettings').select('config').eq('user_id', user.id).single();
-
+	
 				if (error?.code === 'PGRST116') {
 					const { data: newData } = await supabase.from('usersettings').insert({ user_id: user.id, config: {} }).select().single();
 					setConfig(newData.config);
@@ -84,13 +70,36 @@ const WeeklyPlanner = () => {
 				}
 			}
 		};
-
+	
 		const fetchToken = async () => {
 			const response = await fetch('/api/endpoint/auth/token');
 			const { token } = await response.json();
-			if (token) setToken(token);
+			if (token) {
+				setToken(token);
+				scheduleTokenRefresh(token);
+			}
 		};
-
+	
+		const scheduleTokenRefresh = (token) => {
+			const exp = decodeTokenExpiry(token);
+			if (!exp) return;
+	
+			const now = Math.floor(Date.now() / 1000);
+			const secondsUntilExpiry = exp - now;
+	
+			// Refresh 1 minute before expiry
+			const refreshIn = (secondsUntilExpiry - 60) * 1000;
+	
+			if (refreshIn > 0) {
+				setTimeout(() => {
+					fetchToken();
+				}, refreshIn);
+			} else {
+				// Token already expired or too close — refresh now
+				fetchToken();
+			}
+		};
+	
 		loadUser();
 		fetchToken();
 	}, []);
