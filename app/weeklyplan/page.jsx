@@ -557,7 +557,7 @@ const WeeklyPlanner = () => {
 						/>
 					</div>
 				</div>
-
+				<pre>{JSON.stringify(token, null, 2)}</pre>
 				<WorkOrderDetailsModal isOpen={detailsModalOpen} toggle={toggleDetailsModal} data={selectedDetails} />
 			</div>
 			
