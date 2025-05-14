@@ -164,7 +164,7 @@ const WeeklyPlanner = () => {
 						rate: laborRate,
 						planned_revenue: !atRisk ? row.plan_hours * laborRate : 0,
 						projected_revenue: !atRisk ? row.revised_hours * laborRate : 0,
-						at_risk: atRisk ? 'Yes' : 'No'
+						at_risk: atRisk ? 'Yes' : 'No',
 					};
 				});
 				setRowData(enriched);
@@ -440,6 +440,7 @@ const WeeklyPlanner = () => {
 			updatedRow.at_risk = atRisk ? 'Yes' : 'No';
 			updatedRow.planned_revenue = !atRisk ? updatedRow.plan_hours * laborRate : 0;
 			updatedRow.projected_revenue = !atRisk ? updatedRow.revised_hours * laborRate : 0;
+			updatedRow.rate = laborRate;
 
 			setRowData((prevData) => prevData.map((row) => (row.id === updatedRow.id ? { ...row, ...updatedRow } : row)));
 		}
