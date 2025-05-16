@@ -60,7 +60,7 @@ const PlannerSummaryTable = ({ rowData, userList, weekOf }) => {
 
   return (
     <>
-      <Button color="warning" onClick={toggleModal} className='ms-2'>
+      <Button color="secondary" outline onClick={toggleModal} className='ms-2'>
         Summary by Person
       </Button>
 

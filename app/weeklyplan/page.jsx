@@ -4,7 +4,7 @@ import React, { useEffect, useRef, useState, useMemo, useCallback } from 'react'
 import { AgGridReact } from 'ag-grid-react';
 import { AllCommunityModule, ModuleRegistry } from 'ag-grid-community';
 import { createClient } from '@/utils/supabase/client';
-import { Button, FormGroup, Input, InputGroup, Modal, ModalHeader, ModalBody, Row, Col, Collapse, Card, CardHeader, CardBody } from 'reactstrap';
+import { Button, FormGroup, Input, InputGroup, Modal, ModalHeader, ModalBody, Row, Col, Collapse, Card, CardHeader, CardBody, Container } from 'reactstrap';
 import WOSelectEditor from './WOSelectEditor';
 import UserSelectEditor from './UserSelectEditor';
 import WorkOrderDetailsModal from './WorkOrderDetailsModal';
@@ -489,11 +489,12 @@ const WeeklyPlanner = () => {
 
 	return (
 		<>
+		<Container fluid>
 			<div style={{ display: 'flex', flexDirection: 'column', height: '90vh' }}>
 				<Row className="mb-2 px-3">
 					<Col className="d-flex justify-content-between align-items-center">
 						<div></div>
-						<WeekPlannerSettingsModal isOpen={settingsOpen} toggle={toggleSettings} spacing={spacing} setSpacing={setSpacing} />
+						<WeekPlannerSettingsModal isOpen={settingsOpen} toggle={toggleSettings} spacing={spacing} setSpacing={setSpacing} includeClosed={ include_closed } setIncludeClosed={ setIncludeClosed }/>
 					</Col>
 				</Row>
 
@@ -511,26 +512,35 @@ const WeeklyPlanner = () => {
 					</Col>
 				</Row>
 
-				<Row className="mb-3">
-					<Col xs={12} className="text-center">
+				<Row className="mb-0">
+					{/*<Col xs={12} className="text-center">
 						{rowSaving ? <div className="mt-0 mb-2">Saving changes...</div> : <div>Up to date.</div>}
+					</Col>*/}
+					<Col>
+						<Button color="link" onClick={toggleSettings} className="float-end">
+							<FontAwesomeIcon icon={faGear} size="lg" color="black" /> Settings
+						</Button>
+						
 					</Col>
 				</Row>
 
-				<Row className="mb-3 px-3">
+				<hr className='mb-2 mt-1'/>
+				<Row className="mb-2 px-3">
+					<Col>
+						<PlannerSummaryTable rowData={rowData} userList={userList} weekOf={ weekOf} />
+					</Col>
 					<Col className="d-flex justify-content-end">
-						<Button color="link" onClick={toggleSettings} className="me-2">
-							<FontAwesomeIcon icon={faGear} size="lg" color="black" /> Settings
-						</Button>
+						
+
 						<Button color="primary" onClick={handleAddRow} className="me-2">
 							Add Row
 						</Button>
 						<Button onClick={handleDeleteRow}>Delete Selected</Button>
-						<PlannerSummaryTable rowData={rowData} userList={userList} weekOf={ weekOf} />
+
 					</Col>
 				</Row>
 
-				<div style={{ flex: 1, padding: '0 10px' }}>
+				<div style={{ flex: 1, padding: '0 10px', boxSizing: 'border-box' }}>
 					<div
 						className="ag-theme-balham"
 						style={{
@@ -555,11 +565,14 @@ const WeeklyPlanner = () => {
 							onCellValueChanged={handleCellEdit}
 							pinnedBottomRowData={[totalRow]}
 						/>
+						
 					</div>
+
 				</div>
+
 				<WorkOrderDetailsModal isOpen={detailsModalOpen} toggle={toggleDetailsModal} data={selectedDetails} />
 			</div>
-			
+			</Container>
 		</>
 	);
 };
