@@ -6,10 +6,9 @@ import { Button } from 'reactstrap';
 import { faEye } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
-const WeekPlannerSettingsModal = ({ isOpen, toggle, spacing, setSpacing, refreshToken, token }) => {
-	const [showToken, setShowToken] = useState(false);
 
-const WeekPlannerSettingsModal = ({ isOpen, toggle, spacing, setSpacing, includeClosed, setIncludeClosed }) => {
+const WeekPlannerSettingsModal = ({ isOpen, toggle, spacing, setSpacing, includeClosed, setIncludeClosed, refreshToken, token }) => {
+	const [showToken, setShowToken] = useState(false);
 	return (
 		<Modal isOpen={isOpen} toggle={toggle}>
 			<ModalHeader toggle={toggle}>Planner Settings</ModalHeader>
@@ -26,7 +25,16 @@ const WeekPlannerSettingsModal = ({ isOpen, toggle, spacing, setSpacing, include
 						onChange={(e) => setSpacing(parseInt(e.target.value))}
 					/>
 					<div className="text-muted mt-1">Current: {spacing/10}px</div>
-
+					<FormGroup check className='mt-3 mb-5'>
+						<Label check>
+							<Input 
+								type="checkbox"
+								checked={includeClosed}
+								onChange={(e) => setIncludeClosed(e.target.checked)}
+							/> 
+							Include Closed Work Orders
+						</Label>
+					</FormGroup>
 				<hr />
 					<h5>Debug Utilities</h5>
 
@@ -56,16 +64,7 @@ const WeekPlannerSettingsModal = ({ isOpen, toggle, spacing, setSpacing, include
 					</FormGroup>
 				)}
 				{/* checkbox to include closed work orders */}
-				<FormGroup check>
-					<Label check>
-						<Input 
-							type="checkbox"
-							checked={includeClosed}
-							onChange={(e) => setIncludeClosed(e.target.checked)}
-						/> 
-						Include Closed Work Orders
-					</Label>
-				</FormGroup>
+
 			</ModalBody>
 		</Modal>
 	);

@@ -140,34 +140,6 @@ const WeeklyPlanner = () => {
 		fetchToken();
 	}, []);
 
-	const fetchToken = async () => {
-		const response = await fetch('/api/endpoint/auth/token');
-		const { token } = await response.json();
-		if (token) {
-			setToken(token);
-			scheduleTokenRefresh(token);
-		}
-	};
-
-	const scheduleTokenRefresh = (token) => {
-		const exp = decodeTokenExpiry(token);
-		if (!exp) return;
-
-		const now = Math.floor(Date.now() / 1000);
-		const secondsUntilExpiry = exp - now;
-
-		// Refresh 1 minute before expiry
-		const refreshIn = (secondsUntilExpiry - 60) * 1000;
-
-		if (refreshIn > 0) {
-			setTimeout(() => {
-				fetchToken();
-			}, refreshIn);
-		} else {
-			// Token already expired or too close — refresh now
-			fetchToken();
-		}
-	};
 
 	const fetchPlannerData = async () => {
 		if (!weekOf) return;
@@ -529,7 +501,6 @@ const WeeklyPlanner = () => {
 	};
 
 	return (
-		<>
 		<Container fluid>
 			<div style={{ display: 'flex', flexDirection: 'column', height: '90vh' }}>
 
@@ -586,7 +557,7 @@ const WeeklyPlanner = () => {
 
 				<WorkOrderDetailsModal isOpen={detailsModalOpen} toggle={toggleDetailsModal} data={selectedDetails} />
 			</div>
-		</>
+		</Container>
 	);
 };
 
