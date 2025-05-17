@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { React, useState } from 'react'
 import { Modal, ModalHeader, ModalBody, Button, ButtonGroup } from 'reactstrap'
 import { DayPicker } from 'react-day-picker'
 import { format, startOfWeek, isSameWeek, addDays, subDays } from 'date-fns'
@@ -29,9 +29,9 @@ function WeekPickerModal({ weekOf, setWeekOf }) {
 	}
 
 	return (
-		<>
+		<div>
 			<ButtonGroup>
-				<Button color="secondary" outline onClick={goToPreviousWeek}>
+				<Button color="secondary" outline onClick={goToPreviousWeek} >
 					←
 				</Button>
 				<Button color="secondary" onClick={() => setModalOpen(true)}>
@@ -68,7 +68,7 @@ function WeekPickerModal({ weekOf, setWeekOf }) {
 					`}</style>
 				</ModalBody>
 			</Modal>
-		</>
+		</div>
 	)
 }
 

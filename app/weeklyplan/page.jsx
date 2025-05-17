@@ -76,6 +76,45 @@ const WeeklyPlanner = () => {
 	};
 	// Load user and config
 
+	const refreshToken = async () => {
+		const response = await fetch('/api/endpoint/auth/token');
+		const { token } = await response.json();
+		console.log('Token refreshed:', token);
+		if (token) {
+			setToken(token);
+			scheduleTokenRefresh(token);
+		}
+	};
+
+	const fetchToken = async () => {
+		const response = await fetch('/api/endpoint/auth/token');
+		const { token } = await response.json();
+		if (token) {
+			setToken(token);
+			scheduleTokenRefresh(token);
+		}
+	};
+
+	const scheduleTokenRefresh = (token) => {
+		const exp = decodeTokenExpiry(token);
+		if (!exp) return;
+
+		const now = Math.floor(Date.now() / 1000);
+		const secondsUntilExpiry = exp - now;
+
+		// Refresh 1 minute before expiry
+		const refreshIn = (secondsUntilExpiry - 60) * 1000;
+
+		if (refreshIn > 0) {
+			setTimeout(() => {
+				fetchToken();
+			}, refreshIn);
+		} else {
+			// Token already expired or too close — refresh now
+			fetchToken();
+		}
+	};
+
 	useEffect(() => {
 		const loadUser = async () => {
 			const {
@@ -95,34 +134,7 @@ const WeeklyPlanner = () => {
 			}
 		};
 	
-		const fetchToken = async () => {
-			const response = await fetch('/api/endpoint/auth/token');
-			const { token } = await response.json();
-			if (token) {
-				setToken(token);
-				scheduleTokenRefresh(token);
-			}
-		};
-	
-		const scheduleTokenRefresh = (token) => {
-			const exp = decodeTokenExpiry(token);
-			if (!exp) return;
-	
-			const now = Math.floor(Date.now() / 1000);
-			const secondsUntilExpiry = exp - now;
-	
-			// Refresh 1 minute before expiry
-			const refreshIn = (secondsUntilExpiry - 60) * 1000;
-	
-			if (refreshIn > 0) {
-				setTimeout(() => {
-					fetchToken();
-				}, refreshIn);
-			} else {
-				// Token already expired or too close — refresh now
-				fetchToken();
-			}
-		};
+
 	
 		loadUser();
 		fetchToken();
@@ -321,7 +333,7 @@ const WeeklyPlanner = () => {
 			},
 			{
 				field: 'sm_wo',
-				headerName: 'SM WO',
+				headerName: 'Project',
 				editable: true,
 				flex: 2,
 				cellEditor: 'WOSelectEditor',
@@ -490,35 +502,17 @@ const WeeklyPlanner = () => {
 	return (
 		<>
 			<div style={{ display: 'flex', flexDirection: 'column', height: '90vh' }}>
-				<Row className="mb-2 px-3">
-					<Col className="d-flex justify-content-between align-items-center">
-						<div></div>
-						<WeekPlannerSettingsModal isOpen={settingsOpen} toggle={toggleSettings} spacing={spacing} setSpacing={setSpacing} />
-					</Col>
-				</Row>
 
-				<Row className="mb-1 mt-4">
-					<Col xs={12} className="text-center">
-						<h3 className="mb-0">
-							{weekOf ? `Weekly Planner for ${new Date(weekOf).toLocaleDateString(undefined, { timeZone: 'UTC' })}` : 'Weekly Planner'}
-						</h3>
-					</Col>
-				</Row>
+				<WeekPlannerSettingsModal isOpen={settingsOpen} toggle={toggleSettings} spacing={spacing} setSpacing={setSpacing} refreshToken={refreshToken} token={token} />
 
-				<Row className="mb-1">
-					<Col xs={12} className="d-flex justify-content-center">
+				<Row className="mb-3 px-3 mt-5 align-items-center">
+					<Col xs="12" lg="auto" className="d-flex justify-content-start mb-2 mb-lg-0">
+						<h4 className="mb-0 ms-3">{weekOf ? `Weekly Planner for ${new Date(weekOf).toLocaleDateString(undefined, { timeZone: 'UTC' })}` : 'Weekly Planner'}</h4>
+					</Col>
+					<Col xs="12" lg="3" className="d-flex justify-content-center mb-2 mb-lg-0">
 						<WeekPickerModal weekOf={weekOf} setWeekOf={setWeekOf} />
 					</Col>
-				</Row>
-
-				<Row className="mb-3">
-					<Col xs={12} className="text-center">
-						{rowSaving ? <div className="mt-0 mb-2">Saving changes...</div> : <div>Up to date.</div>}
-					</Col>
-				</Row>
-
-				<Row className="mb-3 px-3">
-					<Col className="d-flex justify-content-end">
+					<Col xs="12" lg className="d-flex justify-content-end">
 						<Button color="link" onClick={toggleSettings} className="me-2">
 							<FontAwesomeIcon icon={faGear} size="lg" color="black" /> Settings
 						</Button>
@@ -526,7 +520,7 @@ const WeeklyPlanner = () => {
 							Add Row
 						</Button>
 						<Button onClick={handleDeleteRow}>Delete Selected</Button>
-						<PlannerSummaryTable rowData={rowData} userList={userList} weekOf={ weekOf} />
+						<PlannerSummaryTable rowData={rowData} userList={userList} weekOf={weekOf} />
 					</Col>
 				</Row>
 
@@ -560,7 +554,6 @@ const WeeklyPlanner = () => {
 
 				<WorkOrderDetailsModal isOpen={detailsModalOpen} toggle={toggleDetailsModal} data={selectedDetails} />
 			</div>
-			
 		</>
 	);
 };
