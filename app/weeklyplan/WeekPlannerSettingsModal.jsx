@@ -9,6 +9,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 const WeekPlannerSettingsModal = ({ isOpen, toggle, spacing, setSpacing, refreshToken, token }) => {
 	const [showToken, setShowToken] = useState(false);
 
+const WeekPlannerSettingsModal = ({ isOpen, toggle, spacing, setSpacing, includeClosed, setIncludeClosed }) => {
 	return (
 		<Modal isOpen={isOpen} toggle={toggle}>
 			<ModalHeader toggle={toggle}>Planner Settings</ModalHeader>
@@ -54,6 +55,17 @@ const WeekPlannerSettingsModal = ({ isOpen, toggle, spacing, setSpacing, refresh
 						/>
 					</FormGroup>
 				)}
+				{/* checkbox to include closed work orders */}
+				<FormGroup check>
+					<Label check>
+						<Input 
+							type="checkbox"
+							checked={includeClosed}
+							onChange={(e) => setIncludeClosed(e.target.checked)}
+						/> 
+						Include Closed Work Orders
+					</Label>
+				</FormGroup>
 			</ModalBody>
 		</Modal>
 	);

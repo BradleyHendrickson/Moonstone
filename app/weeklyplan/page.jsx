@@ -4,7 +4,7 @@ import React, { useEffect, useRef, useState, useMemo, useCallback } from 'react'
 import { AgGridReact } from 'ag-grid-react';
 import { AllCommunityModule, ModuleRegistry } from 'ag-grid-community';
 import { createClient } from '@/utils/supabase/client';
-import { Button, FormGroup, Input, InputGroup, Modal, ModalHeader, ModalBody, Row, Col, Collapse, Card, CardHeader, CardBody } from 'reactstrap';
+import { Button, FormGroup, Input, InputGroup, Modal, ModalHeader, ModalBody, Row, Col, Collapse, Card, CardHeader, CardBody, Container } from 'reactstrap';
 import WOSelectEditor from './WOSelectEditor';
 import UserSelectEditor from './UserSelectEditor';
 import WorkOrderDetailsModal from './WorkOrderDetailsModal';
@@ -139,6 +139,35 @@ const WeeklyPlanner = () => {
 		loadUser();
 		fetchToken();
 	}, []);
+
+	const fetchToken = async () => {
+		const response = await fetch('/api/endpoint/auth/token');
+		const { token } = await response.json();
+		if (token) {
+			setToken(token);
+			scheduleTokenRefresh(token);
+		}
+	};
+
+	const scheduleTokenRefresh = (token) => {
+		const exp = decodeTokenExpiry(token);
+		if (!exp) return;
+
+		const now = Math.floor(Date.now() / 1000);
+		const secondsUntilExpiry = exp - now;
+
+		// Refresh 1 minute before expiry
+		const refreshIn = (secondsUntilExpiry - 60) * 1000;
+
+		if (refreshIn > 0) {
+			setTimeout(() => {
+				fetchToken();
+			}, refreshIn);
+		} else {
+			// Token already expired or too close — refresh now
+			fetchToken();
+		}
+	};
 
 	const fetchPlannerData = async () => {
 		if (!weekOf) return;
@@ -501,6 +530,7 @@ const WeeklyPlanner = () => {
 
 	return (
 		<>
+		<Container fluid>
 			<div style={{ display: 'flex', flexDirection: 'column', height: '90vh' }}>
 
 				<WeekPlannerSettingsModal isOpen={settingsOpen} toggle={toggleSettings} spacing={spacing} setSpacing={setSpacing} refreshToken={refreshToken} token={token} />
@@ -524,7 +554,7 @@ const WeeklyPlanner = () => {
 					</Col>
 				</Row>
 
-				<div style={{ flex: 1, padding: '0 10px' }}>
+				<div style={{ flex: 1, padding: '0 10px', boxSizing: 'border-box' }}>
 					<div
 						className="ag-theme-balham"
 						style={{
@@ -549,7 +579,9 @@ const WeeklyPlanner = () => {
 							onCellValueChanged={handleCellEdit}
 							pinnedBottomRowData={[totalRow]}
 						/>
+						
 					</div>
+
 				</div>
 
 				<WorkOrderDetailsModal isOpen={detailsModalOpen} toggle={toggleDetailsModal} data={selectedDetails} />
