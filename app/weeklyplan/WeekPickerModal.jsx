@@ -3,6 +3,8 @@ import { Modal, ModalHeader, ModalBody, Button, ButtonGroup } from 'reactstrap'
 import { DayPicker } from 'react-day-picker'
 import { format, startOfWeek, isSameWeek, addDays, subDays } from 'date-fns'
 import 'react-day-picker/dist/style.css'
+import { faGear, faArrowRight, faArrowLeft } from '@fortawesome/free-solid-svg-icons';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
 function WeekPickerModal({ weekOf, setWeekOf }) {
 	const [modalOpen, setModalOpen] = useState(false)
@@ -31,14 +33,14 @@ function WeekPickerModal({ weekOf, setWeekOf }) {
 	return (
 		<div>
 			<ButtonGroup>
-				<Button color="secondary" outline onClick={goToPreviousWeek} >
-					←
+				<Button color="secondary" outline onClick={goToPreviousWeek}>
+					<FontAwesomeIcon icon={faArrowLeft} size="lg" color="black" />
 				</Button>
 				<Button color="secondary" onClick={() => setModalOpen(true)}>
 					{`Week of: ${format(parsedWeekOf, 'MMM d, yyyy')}`}
 				</Button>
 				<Button color="secondary" outline onClick={goToNextWeek}>
-					→
+					<FontAwesomeIcon icon={faArrowRight} size="lg" color="black" />
 				</Button>
 			</ButtonGroup>
 
