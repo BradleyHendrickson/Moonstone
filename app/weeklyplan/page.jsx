@@ -77,7 +77,8 @@ const WeeklyPlanner = () => {
 	// Load user and config
 
 	const refreshToken = async () => {
-		const response = await fetch('/api/endpoint/auth/token');
+		const timestamp = Date.parse(new Date().toString());
+		const response = await fetch(`/api/endpoint/auth/token?tid=${timestamp}`);
 		const { token } = await response.json();
 		console.log('Token refreshed:', token);
 		if (token) {
@@ -87,7 +88,8 @@ const WeeklyPlanner = () => {
 	};
 
 	const fetchToken = async () => {
-		const response = await fetch('/api/endpoint/auth/token');
+		const timestamp = Date.parse(new Date().toString());
+		const response = await fetch(`/api/endpoint/auth/token?tid=${timestamp}`);
 		const { token } = await response.json();
 		if (token) {
 			setToken(token);
