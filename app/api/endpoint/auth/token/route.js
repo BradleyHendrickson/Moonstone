@@ -7,7 +7,9 @@ const supabase = createClient(
   process.env.SUPABASE_SERVICE_ROLE_KEY // Only safe on server
 );
 
-export async function GET() {
+export const dynamic = 'force-dynamic'; // Enable on-demand revalidation
+
+export async function GET(request) {
   try {
     // Fetch the first (or only) endpointsettings record
     const { data, error } = await supabase
@@ -34,9 +36,17 @@ export async function GET() {
       }
     };
 
-    const token = jwt.sign(payload, endpoint_secret, { algorithm: 'HS256',expiresIn: '2h' });
+    const token = jwt.sign(payload, endpoint_secret, { algorithm: 'HS256', expiresIn: '2h' });
 
-    return NextResponse.json({ token, endpoint_url });
+    // Set cache headers for on-demand revalidation
+    return NextResponse.json(
+      { token, endpoint_url },
+      {
+        headers: {
+          'Cache-Control': 'no-store, max-age=0',
+        },
+      }
+    );
   } catch (err) {
     console.error('Token generation error:', err);
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
